@@ -1,0 +1,23 @@
+<ion-header>
+  <ion-toolbar>
+    <ion-title>Authentifiez vous</ion-title>
+  </ion-toolbar>
+</ion-header>
+
+<ion-content fullscreen="true" class="background-auth">
+    <ion-card class="auth-card" padding>
+        <form (ngSubmit)="authForm()" (keyup.enter)="authForm()">
+            <div class="border-left">
+                <ion-item>
+                  <ion-label position="stacked">User :</ion-label>
+                  <ion-input required="true" required="true" type="input" [(ngModel)]="user.username" name="user"></ion-input>
+                </ion-item>
+                <ion-item>
+                  <ion-label position="stacked">Password :</ion-label>
+                  <ion-input required="true" required="true" type="password" [(ngModel)]="user.password" name="password"></ion-input>
+                </ion-item>
+                <ion-button type="submit">Bodule</ion-button>
+            </div>
+        </form>
+    </ion-card>
+</ion-content>
