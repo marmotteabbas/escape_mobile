@@ -6,7 +6,7 @@ import { Injectable } from '@angular/core';
 export class ReferenceService {
 
   private AUTH_SERVER_ADDRESS:  string  =  'http://localhost/moodle/';
-private token;
+  private static token: string;
   constructor() { }
 
   getHttpAddr() : string {
@@ -14,7 +14,11 @@ private token;
   }
 
   setToken(token) : void {
-    console.log("token is set"+ token.token)
-    this.token = token;
+    console.log("token is set "+ token.token)
+    ReferenceService.token = token.token;
+  }
+
+  getToken() : string {
+    return ReferenceService.token;
   }
 }

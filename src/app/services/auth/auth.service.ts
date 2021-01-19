@@ -20,5 +20,4 @@ login(user: User): Observable<Object[]> {
     tap(res => this.referenceService.setToken(res))
   );
 }
-
 }

@@ -1,14 +1,17 @@
 <ion-header>
   <ion-toolbar>
-    <ion-title>gameselect</ion-title>
+    <ion-title>Selectionnez un jeu</ion-title>
   </ion-toolbar>
 </ion-header>
 
 <ion-content>
   <ion-list >
-    <ion-item *ngFor="let l of list">
-      <ion-label>{{ l.name }}</ion-label><ion-label>{{ l.nb }}</ion-label>
-    </ion-item>
+    <ng-container  *ngFor="let l of list">
+      <ion-item (click)="buttonClick(l.name)">
+        <ion-label>{{ l.cmid }}</ion-label><ion-label>{{ l.name }}</ion-label>
+      </ion-item>
+    </ng-container>
+    
   </ion-list>
 
 </ion-content>
