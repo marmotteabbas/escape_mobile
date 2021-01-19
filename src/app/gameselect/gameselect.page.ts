@@ -41,8 +41,8 @@ export class GameselectPage implements OnInit {
     )
   }
 
-  buttonClick(name) {
-    console.log("buttonclickkkkkkkkkkkkkk"+name);
+  launchGame(name) {
+    console.log("buttonclickkkkkkk"+name);
   }
 
 

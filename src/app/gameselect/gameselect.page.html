@@ -7,7 +7,7 @@
 <ion-content>
   <ion-list >
     <ng-container  *ngFor="let l of list">
-      <ion-item (click)="buttonClick(l.name)">
+      <ion-item (click)="launchGame(l.name)">
         <ion-label>{{ l.cmid }}</ion-label><ion-label>{{ l.name }}</ion-label>
       </ion-item>
     </ng-container>
