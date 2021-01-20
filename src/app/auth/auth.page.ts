@@ -30,11 +30,8 @@ export class AuthPage implements OnInit {
         }
         alertOptions.message = "Erreur de Login//Mot de passe"
         this.alertController.create(alertOptions).then(alertFire => alertFire.present());
-
-        console.log("erreur de ouf ");
       } else {
         this.router.navigate(['/gameselect'])
-
       }
       
       console.log(res);
