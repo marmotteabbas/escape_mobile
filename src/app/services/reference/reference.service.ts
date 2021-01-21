@@ -41,7 +41,7 @@ export class ReferenceService {
     this.storage.set('escapeId', escape_id);
   }
 
-  getEscapeId(escape_id: Number): Promise<Number>  {
+  getEscapeId(): Promise<Number>  {
     return this.storage.get('escapeId');
   }
 

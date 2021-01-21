@@ -6,6 +6,7 @@ import { AlertController } from '@ionic/angular';
 import { ReferenceService } from '../services/reference/reference.service';
 import { GamemanagerService } from '../services/gamemanager/gamemanager.service';
 import { Router } from '@angular/router';
+import { ParamrouterService } from '../services/paramrouter/paramrouter.service';
 
 @Component({
   selector: 'app-gameselect',
@@ -19,8 +20,9 @@ export class GameselectPage implements OnInit {
     private gameslistService: GameslistService,
     private alertController: AlertController,
     private referenceService: ReferenceService,
+    private gamemanagerService: GamemanagerService, 
     private router: Router,
-    private gamemanagerService: GamemanagerService) { }
+    private paramRouter: ParamrouterService) {}
 
   ngOnInit() {
     this.getEscapeList();
@@ -51,6 +53,7 @@ export class GameselectPage implements OnInit {
     this.referenceService.setEscapeId(escape_id);
 
     this.referenceService.getToken().then(token => {
+      //Get the question list
       this.gamemanagerService.getQuestionsList(token, escape_id).subscribe((res:any) => {
         if (res.hasOwnProperty("exception")) {
           let alertOptions: AlertOptions = {
@@ -60,8 +63,26 @@ export class GameselectPage implements OnInit {
           alertOptions.message = res.message;
           this.alertController.create(alertOptions).then(alertFire => alertFire.present());
         } else {
-          console.log(res);
-          this.referenceService.setQuestionsList(res.pages);
+          //lauch chrono
+          this.gamemanagerService.launchrono(token, escape_id).subscribe(() => {
+              console.log(res);
+              this.referenceService.setQuestionsList(res.pages);
+              console.log(res.pages[0].page);
+              this.paramRouter.param = {"typeid" : res.pages[0].page.typeid, "pageid" : res.pages[0].page.id};
+              console.log(res.pages[0].page.typeid);
+              this.router.navigate(['/questionandcontent'])
+          }, (async (error: HttpResponse<Object>) => {
+              let alertOptions: AlertOptions = {
+                header: 'Erreur',
+                message: error.statusText,
+                buttons: ['Ok']
+              }
+                alertOptions.message = "Erreur Web avec service Lauch chrono";
+              
+                let alertFire = await this.alertController.create(alertOptions);
+                alertFire.present();
+          })
+         )
         }
       }, ( async (error: HttpResponse<Object>) => {
           let alertOptions: AlertOptions = {
@@ -76,8 +97,6 @@ export class GameselectPage implements OnInit {
         })
       )
     })
-
-   //this.router.navigate(['/gameselect'])
   }
 
 
