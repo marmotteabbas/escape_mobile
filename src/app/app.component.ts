@@ -5,6 +5,9 @@ import { SplashScreen } from '@ionic-native/splash-screen/ngx';
 import { StatusBar } from '@ionic-native/status-bar/ngx';
 
 import { HttpClient } from '@angular/common/http';
+import { ReferenceService } from './services/reference/reference.service';
+
+import { Router } from '@angular/router';
 
 @Component({
   selector: 'app-root',
@@ -16,7 +19,9 @@ export class AppComponent {
     private platform: Platform,
     private splashScreen: SplashScreen,
     private statusBar: StatusBar,
-    private http: HttpClient
+    private http: HttpClient,
+    private referenceService: ReferenceService,
+    private router: Router
   ) {
     this.initializeApp();
   }
@@ -25,6 +30,11 @@ export class AppComponent {
     this.platform.ready().then(() => {
       this.statusBar.styleDefault();
       this.splashScreen.hide();
+      this.referenceService.getToken().then(token => {
+        if (token !== null) {
+          this.router.navigate(['/gameselect'])
+        }
+      });
     });
   }
 }

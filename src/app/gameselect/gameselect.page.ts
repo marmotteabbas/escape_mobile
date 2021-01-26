@@ -31,7 +31,6 @@ export class GameselectPage implements OnInit {
   getEscapeList() {
     this.referenceService.getToken().then(token => {
       this.gameslistService.getEscapeListForAStudent(token).subscribe((res:any) => {
-        console.log(res.escapes);
         this.list = res.escapes;
       }, ( async (error: HttpResponse<Object>) => {
           let alertOptions: AlertOptions = {
@@ -65,11 +64,8 @@ export class GameselectPage implements OnInit {
         } else {
           //lauch chrono
           this.gamemanagerService.launchrono(token, escape_id).subscribe(() => {
-              console.log(res);
               this.referenceService.setQuestionsList(res.pages);
-              console.log(res.pages[0].page);
               this.paramRouter.param = {"typeid" : res.pages[0].page.typeid, "pageid" : res.pages[0].page.id};
-              console.log(res.pages[0].page.typeid);
               this.router.navigate(['/questionandcontent'])
           }, (async (error: HttpResponse<Object>) => {
               let alertOptions: AlertOptions = {

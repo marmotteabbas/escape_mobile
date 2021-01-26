@@ -29,7 +29,7 @@ export class ReferenceService {
 
   //Manage token of the current user
   setToken(token) : void {
-    this.storage.set('token', token.token);
+    this.storage.set('token', token);
   }
 
   getToken() : Promise<string> {

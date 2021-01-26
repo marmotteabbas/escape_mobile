@@ -13,6 +13,9 @@ import { ReferenceService } from 'src/app/services/reference/reference.service';
 })
 export class TruefalseComponent implements OnInit {
   
+  content = "";
+  title = "";
+  templateAnswers = [];
   constructor(
     private paramrouterService: ParamrouterService,
     private gamemanagerService: GamemanagerService,
@@ -20,13 +23,31 @@ export class TruefalseComponent implements OnInit {
     private referenceService: ReferenceService) { }
 
   ngOnInit() {
-    console.log("====>"+this.paramrouterService.param.pageid+" ____ "+this.paramrouterService.param.typeid);
-
     this.referenceService.getEscapeId().then(escape_id => {
       this.referenceService.getToken().then(token => {
+        //Get the page 
         this.gamemanagerService.getQuestionPage(token, escape_id, this.paramrouterService.param.pageid).subscribe((res:any) => {
-          console.log("laaalalallala =>");
-          console.log(res);
+          this.content = res.page.contents;
+            //Get answers of the question to make a list
+            this.gamemanagerService.getAnswers(token, escape_id, this.paramrouterService.param.pageid, this.paramrouterService.param.cmdi).subscribe((answers:any) => {
+              for (let i = 0; i < res.answers.length; i++) {
+                let tab = answers.answers.filter(a => +a.id === +res.answers[i].id);
+                this.templateAnswers.push([{id: tab[0].id}, {answer: tab[0].answer}]); 
+              }
+              
+              console.log(this.templateAnswers);
+            }, ( async (error: HttpResponse<Object>) => {
+                let alertOptions: AlertOptions = {
+                  header: 'Erreur',
+                  message: error.statusText,
+                  buttons: ['Ok']
+                }
+                  alertOptions.message = "Erreur Web avec service get answers";
+                
+                  let alertFire = await this.alertController.create(alertOptions);
+                  alertFire.present();
+              })
+            )
         }, ( async (error: HttpResponse<Object>) => {
             let alertOptions: AlertOptions = {
               header: 'Erreur',

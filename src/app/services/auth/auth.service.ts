@@ -15,9 +15,9 @@ export class AuthService {
     ) {}
 
 login(user: User): Observable<Object[]> {
-  return this.httpClient.get<Object[]>(this.referenceService.getHttpAddr()+"login/token.php?username="+user.username+"&service=moodle_mobile_app&password="+user.password)
+  return this.httpClient.get<any>(this.referenceService.getHttpAddr()+"login/token.php?username="+user.username+"&service=moodle_mobile_app&password="+user.password)
   .pipe(
-    tap(res => this.referenceService.setToken(res))
+    tap(res => this.referenceService.setToken(res.token))
   );
 }
 }

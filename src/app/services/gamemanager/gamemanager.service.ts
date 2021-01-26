@@ -28,16 +28,21 @@ export class GamemanagerService {
   }
 
   getQuestionPage(token: string, escapeId: Number, pageid: Number): Observable<Object[]> {
-    console.log("getQuestionPage====>>>>> "+token+" "+escapeId+" "+pageid);
-    console.log( this.referenceService.getHttpAddr()
-    + "webservice/rest/server.php?moodlewsrestformat=json&escapeid="+escapeId
-    +"&pageid="+pageid+
-    "&returncontents=0&wsfunction=mod_escape_get_page_data&wstoken="+token+"&moodlewssettingfilter=true");
     return this.httpClient.get<Object[]>(
       this.referenceService.getHttpAddr()
       + "webservice/rest/server.php?moodlewsrestformat=json&escapeid="+escapeId
       +"&pageid="+pageid+
       "&returncontents=0&wsfunction=mod_escape_get_page_data&wstoken="+token+"&moodlewssettingfilter=true"
+    );
+  }
+
+  getAnswers(token: string, escapeId: Number, pageid: Number, cmid: Number): Observable<Object[]> {
+    return this.httpClient.get<Object[]>(
+      this.referenceService.getHttpAddr()
+        +"webservice/rest/server.php?moodlewsrestformat=json&pageid="+pageid
+        +"&cmid="+cmid
+        +"&wsfunction=mod_escape_get_possible_answers_for_a_page&wstoken="+token
+        +"&moodlewssettingfilter=true"
     );
   }
 }
