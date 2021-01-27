@@ -45,4 +45,15 @@ export class GamemanagerService {
         +"&moodlewssettingfilter=true"
     );
   }
+
+  AnswerQuestion(token: string, escapeId: Number, pageid: Number, answerid: Number): Observable<Object[]> {
+    return this.httpClient.get<Object[]>(
+      this.referenceService.getHttpAddr()+
+      "webservice/rest/server.php?wsfunction=mod_escape_answer_question&moodlewsrestformat=json"
+      +"&wstoken="+token
+      +"&escapeid="+escapeId
+      +"&answerorid[0]="+answerid
+      +"&pageid="+pageid
+    );
+  }
 }

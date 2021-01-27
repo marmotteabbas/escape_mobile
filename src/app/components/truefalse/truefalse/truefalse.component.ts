@@ -5,6 +5,8 @@ import { ParamrouterService } from 'src/app/services/paramrouter/paramrouter.ser
 import { AlertOptions } from '@ionic/core';
 import { AlertController } from '@ionic/angular';
 import { ReferenceService } from 'src/app/services/reference/reference.service';
+import { NgForm } from '@angular/forms';
+import { Router } from '@angular/router';
 
 @Component({
   selector: 'app-truefalse',
@@ -16,11 +18,13 @@ export class TruefalseComponent implements OnInit {
   content = "";
   title = "";
   templateAnswers = [];
+  formResponse = {"response": ""};
   constructor(
     private paramrouterService: ParamrouterService,
     private gamemanagerService: GamemanagerService,
     private alertController: AlertController,
-    private referenceService: ReferenceService) { }
+    private referenceService: ReferenceService,
+    private router: Router) { }
 
   ngOnInit() {
     this.referenceService.getEscapeId().then(escape_id => {
@@ -63,6 +67,43 @@ export class TruefalseComponent implements OnInit {
       })
   })
 
+  }
+
+  onSubmit() {
+    this.referenceService.getEscapeId().then(escape_id => {
+      this.referenceService.getToken().then(token => {
+        this.gamemanagerService.AnswerQuestion(token, escape_id, this.paramrouterService.param.pageid,+this.formResponse.response).subscribe((res:any) => {
+            this.referenceService.getQuestionsList().then(getQuestionsList => {
+              for (let pas = 0; pas < getQuestionsList.length; pas++) {
+                if (getQuestionsList[pas] == res.newpageid) {
+                    this.paramrouterService.param = {"typeid" : getQuestionsList.pages[pas].page.typeid, "pageid" : res.newpageid};
+                    break;
+                }
+              }
+              console.log(this.paramrouterService.param);
+              this.router.navigate(['/questionandcontent']);
+            })
+
+            //this.paramrouterService.param = {"typeid" : res.pages[0].page.typeid, "pageid" : res.newpageid};
+            
+          }, ( async (error: HttpResponse<Object>) => {
+            let alertOptions: AlertOptions = {
+              header: 'Erreur',
+              message: error.statusText,
+              buttons: ['Ok']
+            }
+              alertOptions.message = "Erreur Web avec service Answer Question";
+            
+              let alertFire = await this.alertController.create(alertOptions);
+              alertFire.present();
+          })
+        )
+      })
+    })
+  }
+
+  mapToLocalValue(event: any) {
+    this.formResponse = {"response" : event.detail.value};
   }
 
 }

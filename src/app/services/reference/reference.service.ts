@@ -58,4 +58,8 @@ export class ReferenceService {
   setQuestionsList(QuestionsList: any) {
     this.storage.set('QuestionsList', QuestionsList);
   }
+
+  getQuestionsList(): Promise<any> {
+    return this.storage.get('QuestionsList');
+  }
 }
