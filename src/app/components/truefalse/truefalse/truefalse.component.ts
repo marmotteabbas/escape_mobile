@@ -5,8 +5,8 @@ import { ParamrouterService } from 'src/app/services/paramrouter/paramrouter.ser
 import { AlertOptions } from '@ionic/core';
 import { AlertController } from '@ionic/angular';
 import { ReferenceService } from 'src/app/services/reference/reference.service';
-import { NgForm } from '@angular/forms';
 import { Router } from '@angular/router';
+import { QuestionandcontentPage } from 'src/app/questionandcontent/questionandcontent.page';
 
 @Component({
   selector: 'app-truefalse',
@@ -20,6 +20,7 @@ export class TruefalseComponent implements OnInit {
   templateAnswers = [];
   formResponse = {"response": ""};
   constructor(
+    private questionandcontentPage: QuestionandcontentPage,
     private paramrouterService: ParamrouterService,
     private gamemanagerService: GamemanagerService,
     private alertController: AlertController,
@@ -58,7 +59,7 @@ export class TruefalseComponent implements OnInit {
               message: error.statusText,
               buttons: ['Ok']
             }
-              alertOptions.message = "Erreur Web avec service get_question";
+              alertOptions.message = "Erreur Web avec service Get Question True False";
             
               let alertFire = await this.alertController.create(alertOptions);
               alertFire.present();
@@ -74,18 +75,17 @@ export class TruefalseComponent implements OnInit {
       this.referenceService.getToken().then(token => {
         this.gamemanagerService.AnswerQuestion(token, escape_id, this.paramrouterService.param.pageid,+this.formResponse.response).subscribe((res:any) => {
             this.referenceService.getQuestionsList().then(getQuestionsList => {
+              
               for (let pas = 0; pas < getQuestionsList.length; pas++) {
-                if (getQuestionsList[pas] == res.newpageid) {
-                    this.paramrouterService.param = {"typeid" : getQuestionsList.pages[pas].page.typeid, "pageid" : res.newpageid};
+                console.log(getQuestionsList[pas].page.id);
+                if (getQuestionsList[pas].page.id == res.newpageid) {
+                    this.paramrouterService.param = {"typeid" : getQuestionsList[pas].page.typeid, "pageid" : res.newpageid};
                     break;
                 }
               }
-              console.log(this.paramrouterService.param);
-              this.router.navigate(['/questionandcontent']);
-            })
 
-            //this.paramrouterService.param = {"typeid" : res.pages[0].page.typeid, "pageid" : res.newpageid};
-            
+              this.questionandcontentPage.ngOnInit();
+            })
           }, ( async (error: HttpResponse<Object>) => {
             let alertOptions: AlertOptions = {
               header: 'Erreur',

@@ -11,13 +11,16 @@ import { QuestionandcontentPageRoutingModule } from './questionandcontent-routin
 
 import { TruefalseComponentModule } from '../components/truefalse/truefalse/truefalse.component.module';
 
+import { ClickingPictureComponentModule } from '../components/clickingpicture/clickingpicture/clickingpicture.component.module';
 @NgModule({
   imports: [
     CommonModule,
     FormsModule,
     IonicModule,
     QuestionandcontentPageRoutingModule,
-    TruefalseComponentModule
+    TruefalseComponentModule,
+    ClickingPictureComponentModule
+
   ],
   declarations: [QuestionandcontentPage]
 })
