@@ -5,6 +5,7 @@ import { ParamrouterService } from 'src/app/services/paramrouter/paramrouter.ser
 import { ReferenceService } from 'src/app/services/reference/reference.service';
 import { AlertOptions } from '@ionic/core';
 import { AlertController } from '@ionic/angular';
+import { DomSanitizer, SafeHtml } from '@angular/platform-browser';
 
 @Component({
   selector: 'app-clickingpicture',
@@ -15,22 +16,30 @@ import { AlertController } from '@ionic/angular';
 
 export class ClickingpictureComponent implements OnInit {
 
-  content_page="";
-
+  content_page: SafeHtml;
+  middleText = '';
   constructor(private referenceService: ReferenceService,
     private gamemanagerService: GamemanagerService,
     private paramrouterService: ParamrouterService,
-    private alertController: AlertController) { }
+    private alertController: AlertController,
+    private sanitizer: DomSanitizer) { }
 
   ngOnInit() {
     this.referenceService.getEscapeId().then(escape_id => {
       this.referenceService.getToken().then(token => {
         //Get the page 
         this.gamemanagerService.getQuestionPage(token, escape_id, this.paramrouterService.param.pageid).subscribe((res:any) => {
-        this.content_page='data:image/svg+xml;utf8,<svg version="1.1" xmlns="http://www.w3.org/2000/svg" width="512" height="512" viewBox="0 0 512 512"><path d="M384 0h-288c-17.6 0-32 14.399-32 32v448c0 17.6 14.399 32 32 32h288c17.6 0 32-14.4 32-32v-448c0-17.601-14.4-32-32-32zM240 488.891c-13.746 0-24.891-11.145-24.891-24.891s11.145-24.891 24.891-24.891 24.891 11.145 24.891 24.891-11.145 24.891-24.891 24.891zM384 416h-288v-352h288v352z"></path></svg>';
-        //res.page.contents;
-        console.log(this.content_page);
-        }, ( async (error: HttpResponse<Object>) => {
+        
+        //Get Intro content
+        let start = '<span id=\'intro_text_clicking_pix\'>';
+        let end = '</span>';
+        this.middleText = res.page.contents.split(start)[1].split(end)[0];
+
+        //Clean html code
+        let pureSvg: string = res.page.contents.replace('onclick="require(\'mod_escape/img_manager\').coordsandintro(event)"','').replace(".png",".png?forcedownload=1&token="+token).replace("/pluginfile.php","/webservice/pluginfile.php").replace('<span id=\'intro_text_clicking_pix\'>','').replace('</span>','').replace(this.middleText,'').replace('<br />','').replace('<div class="no-overflow">','').replace("</div>","");
+        
+        this.content_page=this.sanitizer.bypassSecurityTrustHtml(pureSvg);
+      }, ( async (error: HttpResponse<Object>) => {
           let alertOptions: AlertOptions = {
             header: 'Erreur',
             message: error.statusText,
@@ -45,6 +54,20 @@ export class ClickingpictureComponent implements OnInit {
 
       })
     })
+  }
+
+  clickPicture(event) {
+    let offsetTop = document.getElementById('content_page').offsetTop;
+    let offsetLeft = document.getElementById('content_page').offsetLeft
+
+    let offsetTopMiddleTexte = document.getElementById('middleTexte').offsetTop
+    
+    console.log(offsetLeft+" "+offsetTop);
+    console.log(event.clientX+" "+event.clientY);
+//https://forum.ionicframework.com/t/how-to-get-ion-header-height-in-angular-the-right-way/186481/3
+    let x = event.clientX-offsetLeft;
+    let y = event.clientY-offsetTop;
+    console.log('x: ' + x +' y: ' + y);
   }
 
 }
