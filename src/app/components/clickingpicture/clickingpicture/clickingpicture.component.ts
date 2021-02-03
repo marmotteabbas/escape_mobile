@@ -6,6 +6,7 @@ import { ReferenceService } from 'src/app/services/reference/reference.service';
 import { AlertOptions } from '@ionic/core';
 import { AlertController } from '@ionic/angular';
 import { DomSanitizer, SafeHtml } from '@angular/platform-browser';
+import { QuestionandcontentPage } from 'src/app/questionandcontent/questionandcontent.page';
 
 @Component({
   selector: 'app-clickingpicture',
@@ -22,7 +23,8 @@ export class ClickingpictureComponent implements OnInit {
     private gamemanagerService: GamemanagerService,
     private paramrouterService: ParamrouterService,
     private alertController: AlertController,
-    private sanitizer: DomSanitizer) { }
+    private sanitizer: DomSanitizer,
+    private questionandcontentPage: QuestionandcontentPage) { }
 
   ngOnInit() {
     this.referenceService.getEscapeId().then(escape_id => {
@@ -62,11 +64,10 @@ export class ClickingpictureComponent implements OnInit {
 
     let offsetTopMiddleTexte = document.getElementById('middleTexte').offsetTop
     
-    console.log(offsetLeft+" "+offsetTop);
-    console.log(event.clientX+" "+event.clientY);
+    console.log("getheigh =>"+this.questionandcontentPage.getHeaderHeight());
 //https://forum.ionicframework.com/t/how-to-get-ion-header-height-in-angular-the-right-way/186481/3
     let x = event.clientX-offsetLeft;
-    let y = event.clientY-offsetTop;
+    let y = event.clientY-offsetTop-this.questionandcontentPage.getHeaderHeight();
     console.log('x: ' + x +' y: ' + y);
   }
 

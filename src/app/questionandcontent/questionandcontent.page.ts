@@ -1,23 +1,24 @@
 import { HttpResponse } from '@angular/common/http';
-import { Component, OnInit } from '@angular/core';
+import { Component, AfterViewInit, ViewChild, ElementRef } from '@angular/core';
 import { GamemanagerService } from '../services/gamemanager/gamemanager.service';
 import { ParamrouterService } from '../services/paramrouter/paramrouter.service';
 import { ReferenceService } from '../services/reference/reference.service';
 import { AlertOptions } from '@ionic/core';
-import { AlertController } from '@ionic/angular';
+import { AlertController, Platform } from '@ionic/angular';
 
 @Component({
   selector: 'app-questionandcontent',
   templateUrl: './questionandcontent.page.html',
   styleUrls: ['./questionandcontent.page.scss'],
 })
-export class QuestionandcontentPage implements OnInit {
+export class QuestionandcontentPage implements AfterViewInit {
   
   constructor(
     private paramrouterService: ParamrouterService,
     private referenceService: ReferenceService,
     private gamemanagerService: GamemanagerService,
-    private alertController: AlertController) { }
+    private alertController: AlertController,
+    private platform: Platform) { }
 
   typeq = 0;
   title_question = '';
@@ -29,7 +30,8 @@ export class QuestionandcontentPage implements OnInit {
   ESCAPE_PAGE_MATCHING = this.referenceService.ESCAPE_PAGE_MATCHING;
   ESCAPE_PAGE_BRANCHTABLE = this.referenceService.ESCAPE_PAGE_BRANCHTABLE
 
-  ngOnInit() {
+  ngAfterViewInit() {        
+   // console.log(this.getHeaderHeight());
     this.typeq = this.paramrouterService.param.typeid;
 
     this.referenceService.getEscapeId().then(escape_id => {
@@ -51,4 +53,14 @@ export class QuestionandcontentPage implements OnInit {
       })
   })
   }
+
+  getHeaderHeight() {
+      var height = this.myIdentifier.nativeElement.offsetHeight;
+      return height;
+  }
+  
+
+  @ViewChild('myIdentifier', {read: ElementRef}) myIdentifier: ElementRef;
+
 }
+//https://www.itsolutionstuff.com/post/how-to-get-element-height-and-width-in-angularexample.html

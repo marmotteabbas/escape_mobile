@@ -84,7 +84,7 @@ export class TruefalseComponent implements OnInit {
                 }
               }
 
-              this.questionandcontentPage.ngOnInit();
+              this.questionandcontentPage.ngAfterViewInit();
             })
           }, ( async (error: HttpResponse<Object>) => {
             let alertOptions: AlertOptions = {
