@@ -4,7 +4,7 @@ import { GamemanagerService } from 'src/app/services/gamemanager/gamemanager.ser
 import { ParamrouterService } from 'src/app/services/paramrouter/paramrouter.service';
 import { ReferenceService } from 'src/app/services/reference/reference.service';
 import { AlertOptions } from '@ionic/core';
-import { AlertController } from '@ionic/angular';
+import { AlertController, Platform } from '@ionic/angular';
 import { DomSanitizer, SafeHtml } from '@angular/platform-browser';
 import { QuestionandcontentPage } from 'src/app/questionandcontent/questionandcontent.page';
 
@@ -24,7 +24,8 @@ export class ClickingpictureComponent implements OnInit {
     private paramrouterService: ParamrouterService,
     private alertController: AlertController,
     private sanitizer: DomSanitizer,
-    private questionandcontentPage: QuestionandcontentPage) { }
+    private questionandcontentPage: QuestionandcontentPage,
+    private platform: Platform) { }
 
   ngOnInit() {
     this.referenceService.getEscapeId().then(escape_id => {
@@ -37,10 +38,8 @@ export class ClickingpictureComponent implements OnInit {
         let end = '</span>';
         this.middleText = res.page.contents.split(start)[1].split(end)[0];
 
-        //Clean html code
-        let pureSvg: string = res.page.contents.replace('onclick="require(\'mod_escape/img_manager\').coordsandintro(event)"','').replace(".png",".png?forcedownload=1&token="+token).replace("/pluginfile.php","/webservice/pluginfile.php").replace('<span id=\'intro_text_clicking_pix\'>','').replace('</span>','').replace(this.middleText,'').replace('<br />','').replace('<div class="no-overflow">','').replace("</div>","");
-        
-        this.content_page=this.sanitizer.bypassSecurityTrustHtml(pureSvg);
+        let svg = this.purifingSvg(res, token);
+        this.content_page=this.sanitizer.bypassSecurityTrustHtml(svg);
       }, ( async (error: HttpResponse<Object>) => {
           let alertOptions: AlertOptions = {
             header: 'Erreur',
@@ -58,6 +57,68 @@ export class ClickingpictureComponent implements OnInit {
     })
   }
 
+  purifingSvg(res: any, token: string) {
+    //Clean html code
+    let pureSvg: string = res.page.contents.replace('onclick="require(\'mod_escape/img_manager\').coordsandintro(event)"','').replace(".png",".png?forcedownload=1&token="+token).replace("/pluginfile.php","/webservice/pluginfile.php").replace('<span id=\'intro_text_clicking_pix\'>','').replace('</span>','').replace(this.middleText,'').replace('<br />','').replace('<div class="no-overflow">','').replace("</div>","");
+    
+    var indexHeight = pureSvg.indexOf("height");
+    var indexEndBalise = pureSvg.indexOf(">");
+
+    let sizeSubstring: String = pureSvg.substr(indexHeight, (indexEndBalise-indexHeight)+1);
+
+    let sizeFirstIndex = sizeSubstring.indexOf('width="')+7;
+    let sizeLastIndex = sizeSubstring.indexOf('" >');
+    console.log("size :" + sizeSubstring.substr(sizeFirstIndex, sizeLastIndex-sizeFirstIndex));
+    pureSvg = pureSvg.replace(pureSvg.substr(indexHeight, indexEndBalise-indexHeight), "");
+
+    let ratio = this.platform.width()/+sizeSubstring.substr(sizeFirstIndex, sizeLastIndex-sizeFirstIndex);
+    console.log("ratio :" +ratio);
+    
+    var circles: Array<String> = new Array();
+
+    /* Manage circles */
+    while (pureSvg.indexOf('<circle') !== -1) {
+      let start = pureSvg.indexOf('<circle');
+      let end = pureSvg.indexOf('</circle>');
+      let oneCircle = pureSvg.substr(start, end-start+9);
+  
+      let cx = oneCircle.indexOf('cx="')+4;
+      let cxEnd = oneCircle.indexOf('" cy');
+      let xValue = +oneCircle.substr(cx, cxEnd-cx);
+  
+      let cy = oneCircle.indexOf('cy="')+4;
+      let cyEnd = oneCircle.indexOf('" r=');
+      let yValue = +oneCircle.substr(cy, cyEnd-cy);
+      console.log(xValue+" "+yValue);
+      
+      let newx = xValue*ratio;
+      let newy = yValue*ratio;
+      console.log(newx.toFixed(3)+" "+newy.toFixed(3));
+      oneCircle = oneCircle.replace('cx="'+xValue, 'cx="'+newx.toFixed(3)).replace('cy="'+yValue, 'cy="'+newy.toFixed(3));
+  
+      circles.push(oneCircle);
+      console.log(circles);
+      console.log(oneCircle);
+      pureSvg = pureSvg.replace(pureSvg.substr(start, end-start+9), "");
+    }
+
+    circles.forEach(cir => pureSvg = pureSvg.replace("</svg>", cir+"</svg>"));
+    pureSvg = pureSvg.replace("<svg ", "<svg "+'width="'+this.platform.width()+'" ');
+
+    let idw1 = pureSvg.indexOf('style="width:');
+    let idw2 = pureSvg.indexOf(';">');
+    let subw = pureSvg.substr(idw1, idw2 -idw1);
+    console.log(idw1+"   "+idw2);
+    console.log(subw);
+
+    let neww = 'style="width:'+this.platform.width();
+    pureSvg = pureSvg.replace(subw, neww);
+    console.log(pureSvg);
+    /************************/
+
+    return pureSvg;
+  }
+
   clickPicture(event) {
     let offsetTop = document.getElementById('content_page').offsetTop;
     let offsetLeft = document.getElementById('content_page').offsetLeft
@@ -70,5 +131,7 @@ export class ClickingpictureComponent implements OnInit {
     let y = event.clientY-offsetTop-this.questionandcontentPage.getHeaderHeight();
     console.log('x: ' + x +' y: ' + y);
   }
+
+  
 
 }
