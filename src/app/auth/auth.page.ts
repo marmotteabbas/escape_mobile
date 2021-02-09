@@ -33,8 +33,6 @@ export class AuthPage implements OnInit {
       } else {
         this.router.navigate(['/gameselect'])
       }
-      
-      console.log(res);
     }, ( async (error: HttpResponse<Object>) => {
         let alertOptions: AlertOptions = {
           header: 'Erreur',

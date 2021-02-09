@@ -56,4 +56,21 @@ export class GamemanagerService {
       +"&pageid="+pageid
     );
   }
+  
+
+  ProcessPage(token: string, escapeId: Number, pageid: Number, kindofjump: Number, cmid: Number): Observable<Object[]> {
+    return this.httpClient.get<Object[]>(
+      this.referenceService.getHttpAddr()+
+      "webservice/rest/server.php?moodlewsrestformat=json"+
+      "&escapeid="+escapeId+
+      "&wsfunction=mod_escape_process_page"+
+      "&wstoken="+token+
+      "&moodlewssettingfilter=true&"+
+      "pageid="+pageid+
+      "&data[0][name]=jumpto"+
+      "&data[0][value]="+kindofjump+
+      "&data[1][name]=id"+
+      "&data[1][value]="+cmid
+        );
+  }
 }
