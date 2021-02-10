@@ -1,3 +1,5 @@
-<p>
-  content works!
-</p>
+<div class = "text-content-content" [innerHtml]="content"></div>
+
+<div class = "text-content-content" *ngFor="let ta of templateAnswers">
+    <button (click)="submitit(ta[0].jumpto)">{{ta[1].answer}}</button>
+</div>
