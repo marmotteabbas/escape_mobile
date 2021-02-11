@@ -5,6 +5,7 @@ import { GamemanagerService } from 'src/app/services/gamemanager/gamemanager.ser
 import { ParamrouterService } from 'src/app/services/paramrouter/paramrouter.service';
 import { AlertController } from '@ionic/angular';
 import { AlertOptions } from '@ionic/core';
+import { QuestionandcontentPage } from 'src/app/questionandcontent/questionandcontent.page';
 @Component({
   selector: 'app-content',
   templateUrl: './content.component.html',
@@ -18,6 +19,7 @@ export class ContentComponent implements OnInit {
     private gamemanagerService: GamemanagerService,
     private paramrouterService: ParamrouterService,
     private alertController: AlertController,
+    private questionandcontentPage: QuestionandcontentPage
     ) { }
 
   ngOnInit() {
@@ -26,14 +28,10 @@ export class ContentComponent implements OnInit {
         this.referenceService.getCmid().then(cmid => {
         this.gamemanagerService.getQuestionPage(token, escape_id, this.paramrouterService.param.pageid).subscribe((res:any) => {
           this.gamemanagerService.getAnswers(token, escape_id, this.paramrouterService.param.pageid, cmid).subscribe((answers:any) => {
-            
             this.content = res.page.contents;
-            console.log(answers);
             for (let i = 0; i < answers.answers.length; i++) {
-              
               this.templateAnswers.push([{jumpto: answers.answers[i].jumpto}, {answer: answers.answers[i].answer}]); 
             }
-            console.log(this.templateAnswers);
           }, ( async (error: HttpResponse<Object>) => {
             let alertOptions: AlertOptions = {
               header: 'Erreur',
@@ -66,14 +64,29 @@ export class ContentComponent implements OnInit {
   }
 
   submitit(jump: number) {
-    console.log(jump);
     this.referenceService.getEscapeId().then(escape_id => {
       this.referenceService.getToken().then(token => {
         this.referenceService.getCmid().then(cmid => {
           this.gamemanagerService.ProcessPage(token,escape_id , this.paramrouterService.param.pageid, jump, cmid).subscribe((processp:any) => {
-                console.log("cest ok");
+                this.referenceService.getQuestionsList().then(getQuestionsList => { 
+                  for (let pas = 0; pas < getQuestionsList.length; pas++) {
+                    if (getQuestionsList[pas].page.id == processp.newpageid) {
+                        this.paramrouterService.param = {"typeid" : getQuestionsList[pas].page.typeid, "pageid" : processp.newpageid};
+                        break;
+                    }
+                  }
+                  this.questionandcontentPage.ngAfterViewInit();
+                })
           }, ( async (error: HttpResponse<Object>) => {
-            console.log("cest MORT !");
+            let alertOptions: AlertOptions = {
+              header: 'Erreur',
+              message: error.statusText,
+              buttons: ['Ok']
+            }
+              alertOptions.message = "Erreur Web avec service Process Page (Content)";
+            
+              let alertFire = await this.alertController.create(alertOptions);
+              alertFire.present();
           })
           )
 

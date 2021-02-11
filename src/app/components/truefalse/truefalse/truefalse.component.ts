@@ -77,7 +77,6 @@ export class TruefalseComponent implements OnInit {
             this.referenceService.getQuestionsList().then(getQuestionsList => {
               
               for (let pas = 0; pas < getQuestionsList.length; pas++) {
-                console.log(getQuestionsList[pas].page.id);
                 if (getQuestionsList[pas].page.id == res.newpageid) {
                     this.paramrouterService.param = {"typeid" : getQuestionsList[pas].page.typeid, "pageid" : res.newpageid};
                     break;

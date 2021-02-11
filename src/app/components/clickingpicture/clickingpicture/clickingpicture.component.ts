@@ -33,7 +33,7 @@ export class ClickingpictureComponent implements OnInit {
       this.referenceService.getToken().then(token => {
         //Get the page 
         this.gamemanagerService.getQuestionPage(token, escape_id, this.paramrouterService.param.pageid).subscribe((res:any) => {
-        console.log(res);
+
         //Get Intro content
         let start = '<span id=\'intro_text_clicking_pix\'>';
         let end = '</span>';
@@ -69,12 +69,11 @@ export class ClickingpictureComponent implements OnInit {
 
     let sizeFirstIndex = sizeSubstring.indexOf('width="')+7;
     let sizeLastIndex = sizeSubstring.indexOf('" >');
-  //  console.log("size :" + sizeSubstring.substr(sizeFirstIndex, sizeLastIndex-sizeFirstIndex));
+
     pureSvg = pureSvg.replace(pureSvg.substr(indexHeight, indexEndBalise-indexHeight), "");
 
     let ratio = this.platform.width()/+sizeSubstring.substr(sizeFirstIndex, sizeLastIndex-sizeFirstIndex);
     this.ratio = ratio;
-    // console.log("ratio :" +ratio);
     
     var circles: Array<String> = new Array();
 
@@ -91,16 +90,12 @@ export class ClickingpictureComponent implements OnInit {
       let cy = oneCircle.indexOf('cy="')+4;
       let cyEnd = oneCircle.indexOf('" r=');
       let yValue = +oneCircle.substr(cy, cyEnd-cy);
-    //  console.log(xValue+" "+yValue);
       
       let newx = xValue*ratio;
       let newy = yValue*ratio;
-      //console.log(newx.toFixed(3)+" "+newy.toFixed(3));
       oneCircle = oneCircle.replace('cx="'+xValue, 'cx="'+newx.toFixed(3)).replace('cy="'+yValue, 'cy="'+newy.toFixed(3));
   
       circles.push(oneCircle);
-   //   console.log(circles);
-     // console.log(oneCircle);
       pureSvg = pureSvg.replace(pureSvg.substr(start, end-start+9), "");
     }
 
@@ -110,12 +105,9 @@ export class ClickingpictureComponent implements OnInit {
     let idw1 = pureSvg.indexOf('style="width:');
     let idw2 = pureSvg.indexOf(';">');
     let subw = pureSvg.substr(idw1, idw2 -idw1);
-  //  console.log(idw1+"   "+idw2);
-    //console.log(subw);
 
     let neww = 'style="width:'+this.platform.width();
     pureSvg = pureSvg.replace(subw, neww);
-   // console.log(pureSvg);
     /************************/
 
     return pureSvg;
@@ -127,8 +119,6 @@ export class ClickingpictureComponent implements OnInit {
 
     let offsetTopMiddleTexte = document.getElementById('middleTexte').offsetTop
     
-  //  console.log("getheigh =>"+this.questionandcontentPage.getHeaderHeight());
-//https://forum.ionicframework.com/t/how-to-get-ion-header-height-in-angular-the-right-way/186481/3
     let x = event.clientX-offsetLeft;
     let y = event.clientY-offsetTop-this.questionandcontentPage.getHeaderHeight();
 
@@ -136,7 +126,6 @@ export class ClickingpictureComponent implements OnInit {
       this.referenceService.getToken().then(token => {
         this.referenceService.getCmid().then(cmid => {
         this.gamemanagerService.getAnswers(token,escape_id , this.paramrouterService.param.pageid, cmid).subscribe((answers:any) => {     
-          console.log(answers);    
           var el;
           answers.answers.forEach(
             element => {
@@ -148,11 +137,8 @@ export class ClickingpictureComponent implements OnInit {
             }
           );
           this.gamemanagerService.ProcessPage(token,escape_id , this.paramrouterService.param.pageid, el.jumpto, cmid).subscribe((processp:any) => { 
-              console.log("dedans");
-              console.log(processp);
               this.referenceService.getQuestionsList().then(getQuestionsList => { 
                 for (let pas = 0; pas < getQuestionsList.length; pas++) {
-                  console.log(getQuestionsList[pas].page.id);
                   if (getQuestionsList[pas].page.id == processp.newpageid) {
                       this.paramrouterService.param = {"typeid" : getQuestionsList[pas].page.typeid, "pageid" : processp.newpageid};
                       break;
