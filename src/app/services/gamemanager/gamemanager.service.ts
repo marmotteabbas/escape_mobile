@@ -56,6 +56,28 @@ export class GamemanagerService {
       +"&pageid="+pageid
     );
   }
+
+  AnswerQuestionMultiple(token: string, escapeId: Number, pageid: Number, answers: Array<String>): Observable<Object[]> {
+    console.log(token);
+    console.log(escapeId);
+    console.log(pageid);
+    console.log(answers);
+    var str_response = "";
+
+    answers.forEach(
+    ([key, value]) => 
+      str_response += "&answerorid["+key+"]="+value
+    );
+      console.log(str_response);
+    return this.httpClient.get<Object[]>(
+      this.referenceService.getHttpAddr()+
+      "webservice/rest/server.php?wsfunction=mod_escape_answer_question&moodlewsrestformat=json"
+      +"&wstoken="+token
+      +"&escapeid="+escapeId
+      +str_response
+      +"&pageid="+pageid
+    );
+  }
   
 
   ProcessPage(token: string, escapeId: Number, pageid: Number, kindofjump: Number, cmid: Number): Observable<Object[]> {

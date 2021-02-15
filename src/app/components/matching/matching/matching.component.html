@@ -1,3 +1,13 @@
-<p>
-  matching works!
-</p>
+<div *ngFor="let tafirst of templateAnswers; let indexfirst = index;">
+  <div *ngIf="indexfirst !=0 && indexfirst!=1">
+  <ion-item class="item-interactive item-select item ios in-list ion-activatable ion-focusable hydrated item-label ion-activated">
+    <ion-label class="sc-ion-label-ios-h sc-ion-label-ios-s ios hydrated" id="ion-sel-3-lbl" aria-hidden="true" [innerHTML]="tafirst.answer"></ion-label>
+    <ion-select interface="popover" role="button" aria-haspopup="listbox" class="ios in-item hydrated" (ionChange)="mapToLocalValue($event,tafirst.id)">
+      <div *ngFor="let ta of templateAnswers; let index = index;">
+        <ion-select-option *ngIf="index !=0 && index!=1" value="{{ta.response}}" role="option" id="ion-selopt-4" class="ios hydrated" [innerHTML]="ta.response"></ion-select-option>
+      </div>
+   </ion-select>
+  </ion-item>
+  </div>
+</div>
+<button (click)="Submit()">Submit</button>

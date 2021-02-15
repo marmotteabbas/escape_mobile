@@ -13,6 +13,8 @@ import { AlertController } from '@ionic/angular';
 })
 export class MatchingComponent implements OnInit {
 
+  formResponse = [];
+  templateAnswers = [];
   constructor(private referenceService: ReferenceService,
     private gamemanagerService: GamemanagerService,
     private paramrouterService: ParamrouterService,
@@ -27,6 +29,11 @@ export class MatchingComponent implements OnInit {
             
               console.log(res);
               console.log(answers);
+              /*
+              delete answers.answers[0];
+              delete answers.answers[1];
+*/
+              this.templateAnswers = answers.answers;
             }, ( async (error: HttpResponse<Object>) => {
               let alertOptions: AlertOptions = {
                 header: 'Erreur',
@@ -55,6 +62,44 @@ export class MatchingComponent implements OnInit {
       })
     })
 
+  }
+
+  Submit() {
+    this.referenceService.getEscapeId().then(escape_id => {
+      this.referenceService.getToken().then(token => {
+        this.gamemanagerService.AnswerQuestionMultiple(token, escape_id, this.paramrouterService.param.pageid,this.formResponse).subscribe((res:any) => {
+          console.log(res);
+          if (res.hasOwnProperty("error")) {
+            let alertOptions: AlertOptions = {
+              header: 'Erreur',
+              buttons: ['Ok']
+            }
+            alertOptions.message = "Erreur Moodle réponse web service Answer Question"
+            this.alertController.create(alertOptions).then(alertFire => alertFire.present());
+          } else {
+            console.log("thats ok");
+           // this.router.navigate(['/gameselect'])
+          }
+        }, ( async (error: HttpResponse<Object>) => {
+          let alertOptions: AlertOptions = {
+            header: 'Erreur',
+            message: error.statusText,
+            buttons: ['Ok']
+          }
+            alertOptions.message = "Erreur Web avec service AnswerQuestionMultiple";
+          
+            let alertFire = await this.alertController.create(alertOptions);
+            alertFire.present();
+        })
+        )
+      })
+    })
+
+  }
+  mapToLocalValue(event: any, idresponse: Number) {
+    console.log(idresponse);
+    console.log(event.detail.value);
+    this.formResponse.push([idresponse, event.detail.value]);
   }
 
 }
