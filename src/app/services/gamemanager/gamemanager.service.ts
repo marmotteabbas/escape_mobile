@@ -58,12 +58,7 @@ export class GamemanagerService {
   }
 
   AnswerQuestionMultiple(token: string, escapeId: Number, pageid: Number, answers: Array<String>): Observable<Object[]> {
-    console.log(token);
-    console.log(escapeId);
-    console.log(pageid);
-    console.log(answers);
     var str_response = "";
-
     answers.forEach(
     ([key, value]) => 
       str_response += "&answerorid["+key+"]="+value
