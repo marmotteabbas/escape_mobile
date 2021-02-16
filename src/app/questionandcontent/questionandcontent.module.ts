@@ -16,6 +16,7 @@ import { ClickingPictureComponentModule } from '../components/clickingpicture/cl
 import { ContentComponentModule } from '../components/content/content/content.component.module';
 import { MatchingComponentModule } from '../components/matching/matching/matching.component.module';
 
+import { NumericalComponentModule } from '../components/numerical/numerical/numerical.component.module';
 @NgModule({
   imports: [
     CommonModule,
@@ -25,7 +26,8 @@ import { MatchingComponentModule } from '../components/matching/matching/matchin
     TruefalseComponentModule,
     ClickingPictureComponentModule,
     ContentComponentModule,
-    MatchingComponentModule
+    MatchingComponentModule,
+    NumericalComponentModule
   ],
   declarations: [QuestionandcontentPage]
 })

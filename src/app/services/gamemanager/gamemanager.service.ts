@@ -46,13 +46,13 @@ export class GamemanagerService {
     );
   }
 
-  AnswerQuestion(token: string, escapeId: Number, pageid: Number, answerid: Number): Observable<Object[]> {
+  AnswerQuestion(token: string, escapeId: Number, pageid: Number, answerorid: Number): Observable<Object[]> {
     return this.httpClient.get<Object[]>(
       this.referenceService.getHttpAddr()+
       "webservice/rest/server.php?wsfunction=mod_escape_answer_question&moodlewsrestformat=json"
       +"&wstoken="+token
       +"&escapeid="+escapeId
-      +"&answerorid[0]="+answerid
+      +"&answerorid[0]="+answerorid
       +"&pageid="+pageid
     );
   }
