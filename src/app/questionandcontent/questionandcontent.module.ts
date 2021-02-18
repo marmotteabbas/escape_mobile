@@ -17,6 +17,8 @@ import { ContentComponentModule } from '../components/content/content/content.co
 import { MatchingComponentModule } from '../components/matching/matching/matching.component.module';
 
 import { NumericalComponentModule } from '../components/numerical/numerical/numerical.component.module';
+
+import { MultiComponentModule } from '../components/multi/multi/multi.component.module';
 @NgModule({
   imports: [
     CommonModule,
@@ -27,7 +29,8 @@ import { NumericalComponentModule } from '../components/numerical/numerical/nume
     ClickingPictureComponentModule,
     ContentComponentModule,
     MatchingComponentModule,
-    NumericalComponentModule
+    NumericalComponentModule,
+    MultiComponentModule
   ],
   declarations: [QuestionandcontentPage]
 })

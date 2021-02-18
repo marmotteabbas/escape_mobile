@@ -1,0 +1,14 @@
+<div class = "text-content-content" [innerHtml]="content"></div>
+
+<ion-list>
+  <ion-radio-group (ionChange)="mapToLocalValue($event)">
+    <div *ngFor="let tafirst of templateAnswers; let indexfirst = index;">
+      <ion-item>
+        <ion-label [innerHTML]="tafirst.answer"></ion-label>
+        <ion-radio value="{{tafirst.id}}"></ion-radio >
+      </ion-item>
+    </div>
+  </ion-radio-group>
+</ion-list>
+
+<button ion-button (click)="onSubmit()">Submit</button>
