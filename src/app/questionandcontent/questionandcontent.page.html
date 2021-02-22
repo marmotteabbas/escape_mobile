@@ -11,4 +11,11 @@
   <app-matching *ngIf="typeq == ESCAPE_PAGE_MATCHING"></app-matching>
   <app-numerical *ngIf="typeq == ESCAPE_PAGE_NUMERICAL"></app-numerical>
   <app-multi *ngIf="typeq == ESCAPE_PAGE_MULTICHOICE"></app-multi>
+  <app-short *ngIf="typeq == ESCAPE_PAGE_SHORTANSWER"></app-short>
+
+  <div *ngIf="typeq == ESCAPE_PAGE_END" class="text-content-content">
+    <div [innerHtml]="content"></div>
+    <button class="backToGameSelector" (click)="backToGameSelector()">Retour Menu</button>
+  </div>
+
 </ion-content>

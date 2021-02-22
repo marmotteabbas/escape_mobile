@@ -1,0 +1,5 @@
+<div class = "text-content-content" [innerHtml]="content"></div>
+<form [formGroup]="todo" (ngSubmit)="onSubmit()" class="text-content-content">
+  <ion-input placeholder="votre réponse" formControlName="answer" ></ion-input>
+  <button>Submit</button>
+</form>

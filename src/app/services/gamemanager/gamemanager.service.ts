@@ -13,11 +13,19 @@ export class GamemanagerService {
     private referenceService: ReferenceService
     ) {}
 
-  launchrono(token: string, escapeid:string): Observable<Object[]> {
+  launchrono(token: string, escapeid:Number): Observable<Object[]> {
       return this.httpClient.get<Object[]>(
         this.referenceService.getHttpAddr()
         +"webservice/rest/server.php?moodlewsrestformat=json&escapeid="+escapeid+"&wsfunction=mod_escape_launch_attempt&wstoken="+
         token+"&moodlewssettingfilter=true");
+  }
+
+  stopchrono(token: string, escapeid:Number): Observable<Object[]> {
+    return this.httpClient.get<Object[]>(
+      this.referenceService.getHttpAddr()
+      +"webservice/rest/server.php?moodlewsrestformat=json&escapeid="+escapeid+"&wsfunction=mod_escape_finish_attempt"+
+      "&wstoken="+token+"&moodlewssettingfilter=true"
+      );
   }
 
   getQuestionsList(token: string, escapeId: Number): Observable<Object[]> {

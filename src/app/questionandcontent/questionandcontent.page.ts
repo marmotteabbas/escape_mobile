@@ -5,6 +5,7 @@ import { ParamrouterService } from '../services/paramrouter/paramrouter.service'
 import { ReferenceService } from '../services/reference/reference.service';
 import { AlertOptions } from '@ionic/core';
 import { AlertController, Platform } from '@ionic/angular';
+import { Router } from '@angular/router';
 
 @Component({
   selector: 'app-questionandcontent',
@@ -18,7 +19,8 @@ export class QuestionandcontentPage implements AfterViewInit {
     private referenceService: ReferenceService,
     private gamemanagerService: GamemanagerService,
     private alertController: AlertController,
-    private platform: Platform) { }
+    private platform: Platform,
+    private router: Router) { }
 
   typeq = 0;
   title_question = '';
@@ -29,29 +31,58 @@ export class QuestionandcontentPage implements AfterViewInit {
   ESCAPE_PAGE_MULTICHOICE = this.referenceService.ESCAPE_PAGE_MULTICHOICE;
   ESCAPE_PAGE_MATCHING = this.referenceService.ESCAPE_PAGE_MATCHING;
   ESCAPE_PAGE_BRANCHTABLE = this.referenceService.ESCAPE_PAGE_BRANCHTABLE
+  ESCAPE_PAGE_END = -9;
 
+  content = "";
   ngAfterViewInit() {        
    // console.log(this.getHeaderHeight());
     this.typeq = this.paramrouterService.param.typeid;
 
     this.referenceService.getEscapeId().then(escape_id => {
       this.referenceService.getToken().then(token => {
-        this.gamemanagerService.getQuestionPage(token, escape_id, this.paramrouterService.param.pageid).subscribe((res:any) => {
-          this.title_question = res.page.title;
-        }, ( async (error: HttpResponse<Object>) => {
-            let alertOptions: AlertOptions = {
-              header: 'Erreur',
-              message: error.statusText,
-              buttons: ['Ok']
-            }
-              alertOptions.message = "Erreur Web avec service get_question";
+        if (this.paramrouterService.param.pageid != -9) {
+          this.gamemanagerService.getQuestionPage(token, escape_id, this.paramrouterService.param.pageid).subscribe((res:any) => {
+            this.title_question = res.page.title;
+          }, ( async (error: HttpResponse<Object>) => {
+              let alertOptions: AlertOptions = {
+                header: 'Erreur',
+                message: error.statusText,
+                buttons: ['Ok']
+              }
+                alertOptions.message = "Erreur Web avec service get_question";
+              
+                let alertFire = await this.alertController.create(alertOptions);
+                alertFire.present();
+            })
+          )
+        } else {
+          this.gamemanagerService.stopchrono(token, escape_id).subscribe((res:any) => {
+            this.title_question = "Fin de jeu";
+            this.content = "Bravo vous avez plié le game! <br />" 
+            + res.data[3].message + "<br />"
+            + res.data[1].message + "<br />";
             
-              let alertFire = await this.alertController.create(alertOptions);
-              alertFire.present();
-          })
-        )
+
+            console.log(res);
+          }, ( async (error: HttpResponse<Object>) => {
+              let alertOptions: AlertOptions = {
+                header: 'Erreur',
+                message: error.statusText,
+                buttons: ['Ok']
+              }
+                alertOptions.message = "Erreur Web avec service get_question";
+              
+                let alertFire = await this.alertController.create(alertOptions);
+                alertFire.present();
+            })
+          )
+        }
+        
       })
-  })
+    })
+  }
+  backToGameSelector() {
+    this.router.navigate(['/gameselect'])
   }
 
   getHeaderHeight() {

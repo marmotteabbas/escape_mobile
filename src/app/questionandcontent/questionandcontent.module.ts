@@ -19,6 +19,8 @@ import { MatchingComponentModule } from '../components/matching/matching/matchin
 import { NumericalComponentModule } from '../components/numerical/numerical/numerical.component.module';
 
 import { MultiComponentModule } from '../components/multi/multi/multi.component.module';
+
+import { ShortComponentModule } from '../components/short/short/short.component.module';
 @NgModule({
   imports: [
     CommonModule,
@@ -30,7 +32,8 @@ import { MultiComponentModule } from '../components/multi/multi/multi.component.
     ContentComponentModule,
     MatchingComponentModule,
     NumericalComponentModule,
-    MultiComponentModule
+    MultiComponentModule,
+    ShortComponentModule
   ],
   declarations: [QuestionandcontentPage]
 })
