@@ -75,15 +75,7 @@ export class TruefalseComponent implements OnInit {
       this.referenceService.getToken().then(token => {
         this.gamemanagerService.AnswerQuestion(token, escape_id, this.paramrouterService.param.pageid,+this.formResponse.response).subscribe((res:any) => {
             this.referenceService.getQuestionsList().then(getQuestionsList => {
-              
-              for (let pas = 0; pas < getQuestionsList.length; pas++) {
-                if (getQuestionsList[pas].page.id == res.newpageid) {
-                    this.paramrouterService.param = {"typeid" : getQuestionsList[pas].page.typeid, "pageid" : res.newpageid};
-                    break;
-                }
-              }
-
-              this.questionandcontentPage.ngAfterViewInit();
+              this.nextpagerouting(res, getQuestionsList)
             })
           }, ( async (error: HttpResponse<Object>) => {
             let alertOptions: AlertOptions = {
@@ -99,6 +91,10 @@ export class TruefalseComponent implements OnInit {
         )
       })
     })
+  }
+
+  nextpagerouting(res, getQuestionsList) {
+    this.questionandcontentPage.nextpagerouting(res, getQuestionsList);
   }
 
   mapToLocalValue(event: any) {

@@ -85,6 +85,21 @@ export class QuestionandcontentPage implements AfterViewInit {
     this.router.navigate(['/gameselect'])
   }
 
+  nextpagerouting(res, getQuestionsList) {
+    if (res.newpageid != -9) {
+      for (let pas = 0; pas < getQuestionsList.length; pas++) {
+         if (getQuestionsList[pas].page.id == res.newpageid) {
+            this.paramrouterService.param = {"typeid" : getQuestionsList[pas].page.typeid, "pageid" : res.newpageid};
+            break;
+         }
+                }
+                this.ngAfterViewInit();
+              } else  {
+                this.paramrouterService.param = {"typeid" : -9, "pageid" : -9};
+                this.ngAfterViewInit();
+              }
+  }
+
   getHeaderHeight() {
       var height = this.myIdentifier.nativeElement.offsetHeight;
       return height;

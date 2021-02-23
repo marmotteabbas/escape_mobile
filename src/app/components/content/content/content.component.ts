@@ -69,13 +69,7 @@ export class ContentComponent implements OnInit {
         this.referenceService.getCmid().then(cmid => {
           this.gamemanagerService.ProcessPage(token,escape_id , this.paramrouterService.param.pageid, jump, cmid).subscribe((processp:any) => {
                 this.referenceService.getQuestionsList().then(getQuestionsList => { 
-                  for (let pas = 0; pas < getQuestionsList.length; pas++) {
-                    if (getQuestionsList[pas].page.id == processp.newpageid) {
-                        this.paramrouterService.param = {"typeid" : getQuestionsList[pas].page.typeid, "pageid" : processp.newpageid};
-                        break;
-                    }
-                  }
-                  this.questionandcontentPage.ngAfterViewInit();
+                  this.nextpagerouting(processp, getQuestionsList);
                 })
           }, ( async (error: HttpResponse<Object>) => {
             let alertOptions: AlertOptions = {
@@ -94,6 +88,10 @@ export class ContentComponent implements OnInit {
       })
     })
     
+  }
+
+  nextpagerouting(res, getQuestionsList) {
+    this.questionandcontentPage.nextpagerouting(res, getQuestionsList);
   }
   
 }

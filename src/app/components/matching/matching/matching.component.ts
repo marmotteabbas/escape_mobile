@@ -76,13 +76,7 @@ export class MatchingComponent implements OnInit {
               this.alertController.create(alertOptions).then(alertFire => alertFire.present());
             } else {
               this.referenceService.getQuestionsList().then(getQuestionsList => { 
-                for (let pas = 0; pas < getQuestionsList.length; pas++) {
-                  if (getQuestionsList[pas].page.id == res.newpageid) {
-                      this.paramrouterService.param = {"typeid" : getQuestionsList[pas].page.typeid, "pageid" : res.newpageid};
-                      break;
-                  }
-                }
-                this.questionandcontentPage.ngAfterViewInit();
+                this.nextpagerouting(res, getQuestionsList);
               })
             }
           }, ( async (error: HttpResponse<Object>) => {
@@ -112,6 +106,10 @@ export class MatchingComponent implements OnInit {
     console.log(idresponse);
     console.log(event.detail.value);
     this.formResponse.push([idresponse, event.detail.value]);
+  }
+
+  nextpagerouting(res, getQuestionsList) {
+    this.questionandcontentPage.nextpagerouting(res, getQuestionsList);
   }
 
 }

@@ -56,20 +56,7 @@ export class ShortComponent implements OnInit {
       this.referenceService.getToken().then(token => {
         this.gamemanagerService.AnswerQuestion(token, escape_id, this.paramrouterService.param.pageid,this.todo.value.answer).subscribe((res:any) => {
             this.referenceService.getQuestionsList().then(getQuestionsList => {
-              console.log(res.newpageid);
-              if (res.newpageid != -9) {
-                for (let pas = 0; pas < getQuestionsList.length; pas++) {
-                  if (getQuestionsList[pas].page.id == res.newpageid) {
-                      this.paramrouterService.param = {"typeid" : getQuestionsList[pas].page.typeid, "pageid" : res.newpageid};
-                      break;
-                  }
-                }
-                this.questionandcontentPage.ngAfterViewInit();
-              } else  {
-                this.paramrouterService.param = {"typeid" : -9, "pageid" : -9};
-                this.questionandcontentPage.ngAfterViewInit();
-              }
-
+              this.nextpagerouting(res, getQuestionsList);
             })
           }, ( async (error: HttpResponse<Object>) => {
             let alertOptions: AlertOptions = {
@@ -85,5 +72,9 @@ export class ShortComponent implements OnInit {
         )
       })
     })
+  }
+
+  nextpagerouting(res, getQuestionsList) {
+    this.questionandcontentPage.nextpagerouting(res, getQuestionsList);
   }
 }

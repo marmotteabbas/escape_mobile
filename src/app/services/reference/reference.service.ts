@@ -62,4 +62,8 @@ export class ReferenceService {
   getQuestionsList(): Promise<any> {
     return this.storage.get('QuestionsList');
   }
+
+  clearStorage() {
+    this.storage.clear();
+  }
 }

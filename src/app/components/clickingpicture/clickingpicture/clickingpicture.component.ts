@@ -138,13 +138,7 @@ export class ClickingpictureComponent implements OnInit {
           );
           this.gamemanagerService.ProcessPage(token,escape_id , this.paramrouterService.param.pageid, el.jumpto, cmid).subscribe((processp:any) => { 
               this.referenceService.getQuestionsList().then(getQuestionsList => { 
-                for (let pas = 0; pas < getQuestionsList.length; pas++) {
-                  if (getQuestionsList[pas].page.id == processp.newpageid) {
-                      this.paramrouterService.param = {"typeid" : getQuestionsList[pas].page.typeid, "pageid" : processp.newpageid};
-                      break;
-                  }
-                }
-                this.questionandcontentPage.ngAfterViewInit();
+                this.nextpagerouting(processp, getQuestionsList);
               })
 
             }, ( async (error: HttpResponse<Object>) => {
@@ -179,6 +173,10 @@ export class ClickingpictureComponent implements OnInit {
 
   cleanCoord(StringCoord: String) {
     return StringCoord.slice(1,-1).split(",");
+  }
+
+  nextpagerouting(res, getQuestionsList) {
+    this.questionandcontentPage.nextpagerouting(res, getQuestionsList);
   }
   
 

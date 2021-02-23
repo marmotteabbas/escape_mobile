@@ -95,5 +95,8 @@ export class GameselectPage implements OnInit {
     })
   }
 
-
+  backToLog() {
+    this.referenceService.clearStorage();
+    this.router.navigate(['/'])
+  }
 }
