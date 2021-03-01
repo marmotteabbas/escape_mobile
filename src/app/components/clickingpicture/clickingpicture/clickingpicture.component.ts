@@ -64,15 +64,29 @@ export class ClickingpictureComponent implements OnInit {
     
     var indexHeight = pureSvg.indexOf("height");
     var indexEndBalise = pureSvg.indexOf(">");
-
+    
+    
     let sizeSubstring: String = pureSvg.substr(indexHeight, (indexEndBalise-indexHeight)+1);
 
     let sizeFirstIndex = sizeSubstring.indexOf('width="')+7;
     let sizeLastIndex = sizeSubstring.indexOf('" >');
+    var widthSVG = +sizeSubstring.substr(sizeFirstIndex, sizeLastIndex-sizeFirstIndex)
 
+    let heightData = sizeSubstring.indexOf('height="')+8;
+    let heightDataEnd = sizeSubstring.indexOf('" width=');
+    let heightSVG = +sizeSubstring.substr(heightData,heightDataEnd-heightData)
+    
     pureSvg = pureSvg.replace(pureSvg.substr(indexHeight, indexEndBalise-indexHeight), "");
 
-    let ratio = this.platform.width()/+sizeSubstring.substr(sizeFirstIndex, sizeLastIndex-sizeFirstIndex);
+    let ratio = this.platform.width()/widthSVG;
+
+    if (!((this.platform.width() >= (ratio*widthSVG)) && (this.platform.height() >= (ratio*heightSVG)))) {
+      ratio = this.platform.height()/heightSVG;
+      console.log("new ratio");
+    }
+    
+    console.log(ratio*widthSVG);
+    console.log(ratio*heightSVG);
     this.ratio = ratio;
     
     var circles: Array<String> = new Array();
@@ -100,7 +114,7 @@ export class ClickingpictureComponent implements OnInit {
     }
 
     circles.forEach(cir => pureSvg = pureSvg.replace("</svg>", cir+"</svg>"));
-    pureSvg = pureSvg.replace("<svg ", "<svg "+'width="'+this.platform.width()+'" ');
+    pureSvg = pureSvg.replace("<svg ", "<svg "+'width="'+(ratio*widthSVG)+'" height="'+(ratio*heightSVG)+'"');
 
     let idw1 = pureSvg.indexOf('style="width:');
     let idw2 = pureSvg.indexOf(';">');
