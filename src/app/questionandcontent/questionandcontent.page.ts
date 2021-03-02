@@ -7,7 +7,7 @@ import { AlertOptions } from '@ionic/core';
 import { AlertController, Platform } from '@ionic/angular';
 import { Router } from '@angular/router';
 import { Map, tileLayer, marker } from "leaflet";
-
+import { Geolocation } from '@ionic-native/geolocation/ngx';
 @Component({
   selector: 'app-questionandcontent',
   templateUrl: './questionandcontent.page.html',
@@ -21,7 +21,8 @@ export class QuestionandcontentPage implements AfterViewInit {
     private gamemanagerService: GamemanagerService,
     private alertController: AlertController,
     private platform: Platform,
-    private router: Router) { }
+    private router: Router,
+    private geolocation: Geolocation) { }
 
   map: Map;
   typeq = 0;
@@ -36,7 +37,7 @@ export class QuestionandcontentPage implements AfterViewInit {
   ESCAPE_PAGE_END = -9;
 
   content = "";
-  ngAfterViewInit() {        
+  ngAfterViewInit() {       
    // console.log(this.getHeaderHeight());
     this.typeq = this.paramrouterService.param.typeid;
 
@@ -44,8 +45,20 @@ export class QuestionandcontentPage implements AfterViewInit {
       this.referenceService.getToken().then(token => {
         if (this.paramrouterService.param.pageid != -9) {
           this.gamemanagerService.getQuestionPage(token, escape_id, this.paramrouterService.param.pageid).subscribe((res:any) => {
+            console.log(res);
+            if (res.location != "") {
+              this.geolocation.getCurrentPosition().then((resp) => {
+                console.log(resp.coords.latitude);
+                console.log(resp.coords.longitude);
+                this.createMap(resp.coords.latitude, resp.coords.longitude);
+                // resp.coords.latitude 
+                // resp.coords.longitude
+               }).catch((error) => {
+                 console.log('Error getting location', error);
+               }) 
+            }
             this.title_question = res.page.title;
-            //this.createMap();
+            
           }, ( async (error: HttpResponse<Object>) => {
               let alertOptions: AlertOptions = {
                 header: 'Erreur',
@@ -85,8 +98,8 @@ export class QuestionandcontentPage implements AfterViewInit {
     })
   }
 
-  createMap() {
-    this.map = new Map("map").setView([17.3850,78.4867], 13);
+  createMap(lat, long) { //on, modal
+    this.map = new Map("map").setView([lat,long], 13);
     tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png',
     { attribution: 'Map data © <a href="https://www.openstreetmap.org/">OpenStreetMap</a> contributors,<a href="https://creativecommons.org/licenses/by-sa/2.0/">CC-BY-SA</a>'}).addTo(this.map);
   }
