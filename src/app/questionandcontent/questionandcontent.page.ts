@@ -6,6 +6,7 @@ import { ReferenceService } from '../services/reference/reference.service';
 import { AlertOptions } from '@ionic/core';
 import { AlertController, Platform } from '@ionic/angular';
 import { Router } from '@angular/router';
+import { Map, tileLayer, marker } from "leaflet";
 
 @Component({
   selector: 'app-questionandcontent',
@@ -22,6 +23,7 @@ export class QuestionandcontentPage implements AfterViewInit {
     private platform: Platform,
     private router: Router) { }
 
+  map: Map;
   typeq = 0;
   title_question = '';
   ESCAPE_PAGE_TRUEFALSE = this.referenceService.ESCAPE_PAGE_TRUEFALSE;
@@ -43,6 +45,7 @@ export class QuestionandcontentPage implements AfterViewInit {
         if (this.paramrouterService.param.pageid != -9) {
           this.gamemanagerService.getQuestionPage(token, escape_id, this.paramrouterService.param.pageid).subscribe((res:any) => {
             this.title_question = res.page.title;
+            //this.createMap();
           }, ( async (error: HttpResponse<Object>) => {
               let alertOptions: AlertOptions = {
                 header: 'Erreur',
@@ -81,6 +84,13 @@ export class QuestionandcontentPage implements AfterViewInit {
       })
     })
   }
+
+  createMap() {
+    this.map = new Map("map").setView([17.3850,78.4867], 13);
+    tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png',
+    { attribution: 'Map data © <a href="https://www.openstreetmap.org/">OpenStreetMap</a> contributors,<a href="https://creativecommons.org/licenses/by-sa/2.0/">CC-BY-SA</a>'}).addTo(this.map);
+  }
+
   backToGameSelector() {
     this.router.navigate(['/gameselect'])
   }

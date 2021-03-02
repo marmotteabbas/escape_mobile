@@ -27,13 +27,14 @@
     "@ionic/angular": "^5.0.0",
     "@ionic/storage": "^2.3.1",
     "cordova-sqlite-storage": "^5.1.0",
+    "leaflet": "^1.7.1",
     "rxjs": "~6.5.5",
     "tslib": "^2.0.0",
     "zone.js": "~0.10.3"
   },
   "devDependencies": {
     "@angular-devkit/build-angular": "~0.1000.0",
-    "@angular/cli": "~10.0.5",
+    "@angular/cli": "10.0.8",
     "@angular/compiler": "~10.0.0",
     "@angular/compiler-cli": "~10.0.0",
     "@angular/language-service": "~10.0.0",
