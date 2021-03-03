@@ -8,7 +8,21 @@
 </ion-header>
 
 <ion-content>
-  <div id="map" style="height:200px"></div> 
+  <div id="window_map_mask">
+  </div>
+    <div id="window_map">
+      <div id="window_map_sub">
+        <div>
+          <h4>Rejoignez la zone indiqué.</h4>
+        </div>
+        <div>
+          <div id="map" style="height:200px"></div> 
+        </div>
+      </div>
+    </div>
+  
+  
+  
   <app-truefalse *ngIf="typeq == ESCAPE_PAGE_TRUEFALSE"></app-truefalse>
   <app-clickingpicture *ngIf="typeq == ESCAPE_PAGE_CLICKINGPICTURE"></app-clickingpicture>
   <app-content *ngIf="typeq == ESCAPE_PAGE_BRANCHTABLE"></app-content>

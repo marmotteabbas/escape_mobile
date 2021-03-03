@@ -6,7 +6,8 @@ import { ReferenceService } from '../services/reference/reference.service';
 import { AlertOptions } from '@ionic/core';
 import { AlertController, Platform } from '@ionic/angular';
 import { Router } from '@angular/router';
-import { Map, tileLayer, marker } from "leaflet";
+import { Map, tileLayer, marker, circle } from "leaflet";
+import * as L from "leaflet";
 import { Geolocation } from '@ionic-native/geolocation/ngx';
 @Component({
   selector: 'app-questionandcontent',
@@ -25,6 +26,8 @@ export class QuestionandcontentPage implements AfterViewInit {
     private geolocation: Geolocation) { }
 
   map: Map;
+  newMarker: any;
+  
   typeq = 0;
   title_question = '';
   ESCAPE_PAGE_TRUEFALSE = this.referenceService.ESCAPE_PAGE_TRUEFALSE;
@@ -38,6 +41,11 @@ export class QuestionandcontentPage implements AfterViewInit {
 
   content = "";
   ngAfterViewInit() {       
+    let alertOptions: AlertOptions = {
+      header: 'Geolaclisation',
+      message: '<div id="map" style="height:200px"></div> ',
+      buttons: ['Ok']
+    }
    // console.log(this.getHeaderHeight());
     this.typeq = this.paramrouterService.param.typeid;
 
@@ -48,14 +56,10 @@ export class QuestionandcontentPage implements AfterViewInit {
             console.log(res);
             if (res.location != "") {
               this.geolocation.getCurrentPosition().then((resp) => {
-                console.log(resp.coords.latitude);
-                console.log(resp.coords.longitude);
-                this.createMap(resp.coords.latitude, resp.coords.longitude);
-                // resp.coords.latitude 
-                // resp.coords.longitude
-               }).catch((error) => {
+                this.createMap(resp.coords.latitude, resp.coords.longitude, res.location.substring(1, res.location.length-1).split(",")[0], res.location.substring(1, res.location.length-1).split(",")[1]);
+              }).catch((error) => {
                  console.log('Error getting location', error);
-               }) 
+              }) 
             }
             this.title_question = res.page.title;
             
@@ -97,11 +101,28 @@ export class QuestionandcontentPage implements AfterViewInit {
       })
     })
   }
-
-  createMap(lat, long) { //on, modal
-    this.map = new Map("map").setView([lat,long], 13);
+//https://gis.stackexchange.com/questions/259969/leaflet-how-to-update-user-position-marker-real-time
+  createMap(lat_user, long_user, lat_target, long_target) { //on, modal
+    this.map = new Map("map").setView([lat_user,long_user], 13);
     tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png',
     { attribution: 'Map data © <a href="https://www.openstreetmap.org/">OpenStreetMap</a> contributors,<a href="https://creativecommons.org/licenses/by-sa/2.0/">CC-BY-SA</a>'}).addTo(this.map);
+    
+    this.newMarker = marker([lat_target, long_target], {}).addTo(this.map);
+
+    // create custom marker
+    var greenIcon = L.icon({
+      iconUrl: 'https://static.thenounproject.com/png/331569-200.png',
+
+      iconSize:     [50, 50], // size of the icon
+      iconAnchor:   [25, 50], // point of the icon which will correspond to marker's location
+    });
+    this.newMarker = marker([lat_user, long_user], {icon: greenIcon}).addTo(this.map);
+
+
+/*
+    this.map.removeLayer(this.newMarker);
+    this.newMarker = marker([lat, 7], { draggable: true }).addTo(this.map);
+    console.log(this.newMarker);*/
   }
 
   backToGameSelector() {
