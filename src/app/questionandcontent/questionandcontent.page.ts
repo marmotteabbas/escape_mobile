@@ -8,7 +8,7 @@ import { AlertController, Platform } from '@ionic/angular';
 import { Router } from '@angular/router';
 import { Map, tileLayer, marker, circle } from "leaflet";
 import * as L from "leaflet";
-import { Geolocation } from '@ionic-native/geolocation/ngx';
+import { Geolocation, Geoposition } from '@ionic-native/geolocation/ngx';
 @Component({
   selector: 'app-questionandcontent',
   templateUrl: './questionandcontent.page.html',
@@ -27,7 +27,7 @@ export class QuestionandcontentPage implements AfterViewInit {
 
   map: Map;
   newMarker: any;
-  
+  MarkerTarget: any;
   typeq = 0;
   title_question = '';
   ESCAPE_PAGE_TRUEFALSE = this.referenceService.ESCAPE_PAGE_TRUEFALSE;
@@ -41,25 +41,54 @@ export class QuestionandcontentPage implements AfterViewInit {
 
   content = "";
   ngAfterViewInit() {       
-    let alertOptions: AlertOptions = {
-      header: 'Geolaclisation',
-      message: '<div id="map" style="height:200px"></div> ',
-      buttons: ['Ok']
-    }
-   // console.log(this.getHeaderHeight());
+    var goodlocate = false;
     this.typeq = this.paramrouterService.param.typeid;
-
     this.referenceService.getEscapeId().then(escape_id => {
       this.referenceService.getToken().then(token => {
         if (this.paramrouterService.param.pageid != -9) {
           this.gamemanagerService.getQuestionPage(token, escape_id, this.paramrouterService.param.pageid).subscribe((res:any) => {
-            console.log(res);
-            if (res.location != "") {
+            if (res.location != "" && goodlocate == false) {
+              this.window_map_mask.nativeElement.style.display="block";
+              this.window_map.nativeElement.style.display="block";
+              console.log("hello")
               this.geolocation.getCurrentPosition().then((resp) => {
-                this.createMap(resp.coords.latitude, resp.coords.longitude, res.location.substring(1, res.location.length-1).split(",")[0], res.location.substring(1, res.location.length-1).split(",")[1]);
+              this.createMap(resp.coords.latitude, resp.coords.longitude, res.location.substring(1, res.location.length-1).split(",")[0], res.location.substring(1, res.location.length-1).split(",")[1]);
+              
               }).catch((error) => {
                  console.log('Error getting location', error);
               }) 
+
+              let watch = this.geolocation.watchPosition();
+              watch.subscribe((data: Geoposition) => {
+                if ((data.coords.latitude >= +res.location.substring(1, res.location.length-1).split(",")[0] + 0.0001
+                    ||
+                    data.coords.latitude <= +res.location.substring(1, res.location.length-1).split(",")[0] - 0.0001
+                    )
+                    &&
+                    (data.coords.longitude >= +res.location.substring(1, res.location.length-1).split(",")[1] + 0.0001
+                    ||
+                    data.coords.longitude <= +res.location.substring(1, res.location.length-1).split(",")[1] - 0.0001 
+                    )
+                ) {
+                  var greenIcon = this.getGreenIcon();
+                  this.map.removeLayer(this.newMarker);
+                  this.newMarker = marker([data.coords.latitude, data.coords.longitude], {icon: greenIcon}).addTo(this.map);
+                } else {
+                  if (goodlocate == false) {
+                    goodlocate = true;
+                    let alertOptions: AlertOptions = {
+                      header: 'Localisation',
+                      buttons: ['Ok']
+                    }
+                    alertOptions.message = "Vous êtes arrivé à destination !"
+                    this.alertController.create(alertOptions).then(alertFire => alertFire.present());
+                    
+                    //this.map.removeLayer(this.MarkerTarget);
+                    this.window_map_mask.nativeElement.style.display="none";
+                    this.window_map.nativeElement.style.display="none";
+                  }
+                }
+              });
             }
             this.title_question = res.page.title;
             
@@ -107,22 +136,20 @@ export class QuestionandcontentPage implements AfterViewInit {
     tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png',
     { attribution: 'Map data © <a href="https://www.openstreetmap.org/">OpenStreetMap</a> contributors,<a href="https://creativecommons.org/licenses/by-sa/2.0/">CC-BY-SA</a>'}).addTo(this.map);
     
-    this.newMarker = marker([lat_target, long_target], {}).addTo(this.map);
+    this.MarkerTarget = marker([lat_target, long_target], {}).addTo(this.map);
 
     // create custom marker
-    var greenIcon = L.icon({
+    var greenIcon = this.getGreenIcon();
+    this.newMarker = marker([lat_user, long_user], {icon: greenIcon}).addTo(this.map);
+  }
+
+  getGreenIcon() {
+    return L.icon({
       iconUrl: 'https://static.thenounproject.com/png/331569-200.png',
 
       iconSize:     [50, 50], // size of the icon
       iconAnchor:   [25, 50], // point of the icon which will correspond to marker's location
     });
-    this.newMarker = marker([lat_user, long_user], {icon: greenIcon}).addTo(this.map);
-
-
-/*
-    this.map.removeLayer(this.newMarker);
-    this.newMarker = marker([lat, 7], { draggable: true }).addTo(this.map);
-    console.log(this.newMarker);*/
   }
 
   backToGameSelector() {
@@ -151,6 +178,8 @@ export class QuestionandcontentPage implements AfterViewInit {
   
 
   @ViewChild('myIdentifier', {read: ElementRef}) myIdentifier: ElementRef;
-
+  @ViewChild('window_map_mask', {read: ElementRef}) window_map_mask: ElementRef;
+  @ViewChild('window_map', {read: ElementRef}) window_map: ElementRef;
+  @ViewChild('map', {read: ElementRef}) mappy: ElementRef;
 }
 //https://www.itsolutionstuff.com/post/how-to-get-element-height-and-width-in-angularexample.html
