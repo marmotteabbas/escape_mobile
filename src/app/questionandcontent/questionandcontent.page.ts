@@ -25,6 +25,8 @@ export class QuestionandcontentPage implements AfterViewInit {
     private router: Router,
     private geolocation: Geolocation) { }
 
+  currentLatitude: Number;
+  currentLongitude: Number;
   map: Map;
   newMarker: any;
   MarkerTarget: any;
@@ -50,45 +52,68 @@ export class QuestionandcontentPage implements AfterViewInit {
             if (res.location != "" && goodlocate == false) {
               this.window_map_mask.nativeElement.style.display="block";
               this.window_map.nativeElement.style.display="block";
-              console.log("hello")
-              this.geolocation.getCurrentPosition().then((resp) => {
-              this.createMap(resp.coords.latitude, resp.coords.longitude, res.location.substring(1, res.location.length-1).split(",")[0], res.location.substring(1, res.location.length-1).split(",")[1]);
-              
-              }).catch((error) => {
-                 console.log('Error getting location', error);
-              }) 
+              if (!this.map) {
+                  console.log("not map yet");
+                  this.geolocation.getCurrentPosition().then((resp) => {
+                    this.currentLatitude = resp.coords.latitude;
+                    this.currentLongitude = resp.coords.longitude;
+                    this.createMap(resp.coords.latitude, resp.coords.longitude, res.location.substring(1, res.location.length-1).split(",")[0], res.location.substring(1, res.location.length-1).split(",")[1]);  
+                  }).catch((error) => {
+                    console.log('Error getting location', error);
+                  }) 
 
-              let watch = this.geolocation.watchPosition();
-              watch.subscribe((data: Geoposition) => {
-                if ((data.coords.latitude >= +res.location.substring(1, res.location.length-1).split(",")[0] + 0.0001
-                    ||
-                    data.coords.latitude <= +res.location.substring(1, res.location.length-1).split(",")[0] - 0.0001
-                    )
-                    &&
-                    (data.coords.longitude >= +res.location.substring(1, res.location.length-1).split(",")[1] + 0.0001
-                    ||
-                    data.coords.longitude <= +res.location.substring(1, res.location.length-1).split(",")[1] - 0.0001 
-                    )
-                ) {
-                  var greenIcon = this.getGreenIcon();
-                  this.map.removeLayer(this.newMarker);
-                  this.newMarker = marker([data.coords.latitude, data.coords.longitude], {icon: greenIcon}).addTo(this.map);
-                } else {
-                  if (goodlocate == false) {
-                    goodlocate = true;
-                    let alertOptions: AlertOptions = {
-                      header: 'Localisation',
-                      buttons: ['Ok']
+                  let watch = this.geolocation.watchPosition();
+                  watch.subscribe((data: Geoposition) => {
+                    console.log("watch position");
+                    if ((data.coords.latitude >= +res.location.substring(1, res.location.length-1).split(",")[0] + 0.0001
+                        ||
+                        data.coords.latitude <= +res.location.substring(1, res.location.length-1).split(",")[0] - 0.0001
+                        )
+                        &&
+                        (data.coords.longitude >= +res.location.substring(1, res.location.length-1).split(",")[1] + 0.0001
+                        ||
+                        data.coords.longitude <= +res.location.substring(1, res.location.length-1).split(",")[1] - 0.0001 
+                        )
+                    ) {
+                      this.currentLatitude = data.coords.latitude;
+                      this.currentLongitude = data.coords.longitude;
+                      var greenIcon = this.getGreenIcon();
+                      this.map.removeLayer(this.newMarker);
+                      this.newMarker = marker([data.coords.latitude, data.coords.longitude], {icon: greenIcon}).addTo(this.map);
+                    } else {
+                      if (goodlocate == false) {
+                        goodlocate = true;
+                        this.goodPos();
+                      }
                     }
-                    alertOptions.message = "Vous êtes arrivé à destination !"
-                    this.alertController.create(alertOptions).then(alertFire => alertFire.present());
-                    
-                    //this.map.removeLayer(this.MarkerTarget);
-                    this.window_map_mask.nativeElement.style.display="none";
-                    this.window_map.nativeElement.style.display="none";
-                  }
+                  });
+              } else { // The map is already loaded, juste change the pointer
+                this.map.removeLayer(this.newMarker);
+                this.map.removeLayer(this.MarkerTarget);
+
+                this.MarkerTarget = marker([res.location.substring(1, res.location.length-1).split(",")[0], res.location.substring(1, res.location.length-1).split(",")[1]], {}).addTo(this.map);
+
+                var greenIcon = this.getGreenIcon();
+                this.newMarker = marker([this.currentLatitude, this.currentLongitude], {icon: greenIcon}).addTo(this.map);
+              //  this.map.zoomOut(1.2);
+                this.map.fitBounds([[res.location.substring(1, res.location.length-1).split(",")[0], res.location.substring(1, res.location.length-1).split(",")[1]],[this.currentLatitude, this.currentLongitude]]);
+                
+                if (!((this.currentLatitude >= +res.location.substring(1, res.location.length-1).split(",")[0] + 0.0001
+                        ||
+                        this.currentLatitude <= +res.location.substring(1, res.location.length-1).split(",")[0] - 0.0001
+                        )
+                        &&
+                        (this.currentLongitude >= +res.location.substring(1, res.location.length-1).split(",")[1] + 0.0001
+                        ||
+                        this.currentLongitude <= +res.location.substring(1, res.location.length-1).split(",")[1] - 0.0001 
+                        )
+                  )) {
+                    if (goodlocate == false) {
+                      goodlocate = true;
+                      this.goodPos();
+                    }
                 }
-              });
+              }
             }
             this.title_question = res.page.title;
             
@@ -132,15 +157,18 @@ export class QuestionandcontentPage implements AfterViewInit {
   }
 //https://gis.stackexchange.com/questions/259969/leaflet-how-to-update-user-position-marker-real-time
   createMap(lat_user, long_user, lat_target, long_target) { //on, modal
-    this.map = new Map("map").setView([lat_user,long_user], 13);
-    tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png',
-    { attribution: 'Map data © <a href="https://www.openstreetmap.org/">OpenStreetMap</a> contributors,<a href="https://creativecommons.org/licenses/by-sa/2.0/">CC-BY-SA</a>'}).addTo(this.map);
-    
-    this.MarkerTarget = marker([lat_target, long_target], {}).addTo(this.map);
+      this.map = new Map("map");
+      this.map.fitBounds([[lat_user,long_user],[lat_target,long_target]]);
 
-    // create custom marker
-    var greenIcon = this.getGreenIcon();
-    this.newMarker = marker([lat_user, long_user], {icon: greenIcon}).addTo(this.map);
+      tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png',
+      { attribution: 'Map data © <a href="https://www.openstreetmap.org/">OpenStreetMap</a> contributors,<a href="https://creativecommons.org/licenses/by-sa/2.0/">CC-BY-SA</a>'}).addTo(this.map);
+      
+      this.MarkerTarget = marker([lat_target, long_target], {}).addTo(this.map);
+  
+      // create custom marker
+      var greenIcon = this.getGreenIcon();
+      this.newMarker = marker([lat_user, long_user], {icon: greenIcon}).addTo(this.map);
+      this.map.fitBounds([[lat_target, long_target],[lat_user, long_user]]);
   }
 
   getGreenIcon() {
@@ -176,6 +204,18 @@ export class QuestionandcontentPage implements AfterViewInit {
       return height;
   }
   
+  goodPos() {
+    let alertOptions: AlertOptions = {
+      header: 'Localisation',
+      buttons: ['Ok']
+    }
+    alertOptions.message = "Vous êtes arrivé à destination !"
+    this.alertController.create(alertOptions).then(alertFire => alertFire.present());
+    
+    //this.map.removeLayer(this.MarkerTarget);
+    this.window_map_mask.nativeElement.style.display="none";
+    this.window_map.nativeElement.style.display="none";
+  }
 
   @ViewChild('myIdentifier', {read: ElementRef}) myIdentifier: ElementRef;
   @ViewChild('window_map_mask', {read: ElementRef}) window_map_mask: ElementRef;
