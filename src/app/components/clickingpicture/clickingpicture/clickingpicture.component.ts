@@ -7,6 +7,7 @@ import { AlertOptions } from '@ionic/core';
 import { AlertController, Platform } from '@ionic/angular';
 import { DomSanitizer, SafeHtml } from '@angular/platform-browser';
 import { QuestionandcontentPage } from 'src/app/questionandcontent/questionandcontent.page';
+import { ScreenOrientation } from '@ionic-native/screen-orientation/ngx';
 
 @Component({
   selector: 'app-clickingpicture',
@@ -26,7 +27,15 @@ export class ClickingpictureComponent implements OnInit {
     private alertController: AlertController,
     private sanitizer: DomSanitizer,
     private questionandcontentPage: QuestionandcontentPage,
-    private platform: Platform) { }
+    private platform: Platform,
+    private screenOrientation: ScreenOrientation) { 
+      this.screenOrientation.onChange().subscribe(
+        () => {
+          this.ngOnInit();
+          console.log("Orientation Changedd");
+        }
+     );
+    }
 
   ngOnInit() {
     this.referenceService.getEscapeId().then(escape_id => {
@@ -35,11 +44,19 @@ export class ClickingpictureComponent implements OnInit {
         this.gamemanagerService.getQuestionPage(token, escape_id, this.paramrouterService.param.pageid).subscribe((res:any) => {
 
         //Get Intro content
-        let start = '<span id=\'intro_text_clicking_pix\'>';
+        let start: String;
+        if (res.page.contents.includes('<span id=\'intro_text_clicking_pix\'>')) {
+          start = '<span id=\'intro_text_clicking_pix\'>';
+        } else {
+          start = '<span id="intro_text_clicking_pix">';
+        }
+        
         let end = '</span>';
-        this.middleText = res.page.contents.split(start)[1].split(end)[0];
 
+        this.middleText = res.page.contents.split(start)[1].split(end)[0];
+        console.log(res.page.contents);
         let svg = this.purifingSvg(res, token);
+
         this.content_page=this.sanitizer.bypassSecurityTrustHtml(svg);
       }, ( async (error: HttpResponse<Object>) => {
           let alertOptions: AlertOptions = {
@@ -60,11 +77,10 @@ export class ClickingpictureComponent implements OnInit {
 
   purifingSvg(res: any, token: string) {
     //Clean html code
-    let pureSvg: string = res.page.contents.replace('onclick="require(\'mod_escape/img_manager\').coordsandintro(event)"','').replace(".png",".png?forcedownload=1&token="+token).replace("/pluginfile.php","/webservice/pluginfile.php").replace('<span id=\'intro_text_clicking_pix\'>','').replace('</span>','').replace(this.middleText,'').replace('<br />','').replace('<div class="no-overflow">','').replace("</div>","");
+    let pureSvg: string = res.page.contents.replace('onclick="require(\'mod_escape/img_manager\').coordsandintro(event)"','').replace(".jpg",".jpg?forcedownload=1&token="+token).replace(".png",".png?forcedownload=1&token="+token).replace("/pluginfile.php","/webservice/pluginfile.php").replace('<span id="intro_text_clicking_pix">','').replace('<span id=\'intro_text_clicking_pix\'>','').replace('</span>','').replace(this.middleText,'').replace('<br>','').replace('<br />','').replace('<div class="no-overflow">','').replace("</div>","");
     
     var indexHeight = pureSvg.indexOf("height");
     var indexEndBalise = pureSvg.indexOf(">");
-    
     
     let sizeSubstring: String = pureSvg.substr(indexHeight, (indexEndBalise-indexHeight)+1);
 
@@ -74,19 +90,20 @@ export class ClickingpictureComponent implements OnInit {
 
     let heightData = sizeSubstring.indexOf('height="')+8;
     let heightDataEnd = sizeSubstring.indexOf('" width=');
+
     let heightSVG = +sizeSubstring.substr(heightData,heightDataEnd-heightData)
+    console.log(sizeSubstring);
     
     pureSvg = pureSvg.replace(pureSvg.substr(indexHeight, indexEndBalise-indexHeight), "");
 
     let ratio = this.platform.width()/widthSVG;
-
-    if (!((this.platform.width() >= (ratio*widthSVG)) && (this.platform.height() >= (ratio*heightSVG)))) {
-      ratio = this.platform.height()/heightSVG;
-      console.log("new ratio");
-    }
-    
     console.log(ratio*widthSVG);
     console.log(ratio*heightSVG);
+
+    if (!(((this.platform.width()+1) >= (ratio*widthSVG)) && ((this.platform.height()+1) >= (ratio*heightSVG)))) {
+      ratio = this.platform.height()/heightSVG;
+    }
+
     this.ratio = ratio;
     
     var circles: Array<String> = new Array();
@@ -123,7 +140,7 @@ export class ClickingpictureComponent implements OnInit {
     let neww = 'style="width:'+this.platform.width();
     pureSvg = pureSvg.replace(subw, neww);
     /************************/
-
+    console.log(pureSvg);
     return pureSvg;
   }
 
