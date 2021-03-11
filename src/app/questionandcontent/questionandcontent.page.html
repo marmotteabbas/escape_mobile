@@ -7,7 +7,7 @@
   crossorigin=""/>
 </ion-header>
 
-<ion-content>
+<ion-content [scrollEvents]="true" (ionScroll)="logScrolling($event)" >
   <div id="window_map_mask" #window_map_mask>
   </div>
     <div id="window_map" #window_map>

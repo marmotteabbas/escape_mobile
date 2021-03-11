@@ -42,6 +42,10 @@ export class QuestionandcontentPage implements AfterViewInit {
   ESCAPE_PAGE_END = -9;
 
   content = "";
+
+  logScrolling($event) {
+    console.log($event.detail.scrollTop);
+  }
   ngAfterViewInit() {       
     var goodlocate = false;
     this.typeq = this.paramrouterService.param.typeid;
