@@ -66,7 +66,6 @@ export class MatchingComponent implements OnInit {
       this.referenceService.getEscapeId().then(escape_id => {
         this.referenceService.getToken().then(token => {
           this.gamemanagerService.AnswerQuestionMultiple(token, escape_id, this.paramrouterService.param.pageid,this.formResponse).subscribe((res:any) => {
-            console.log(res);
             if (res.hasOwnProperty("error")) {
               let alertOptions: AlertOptions = {
                 header: 'Erreur',

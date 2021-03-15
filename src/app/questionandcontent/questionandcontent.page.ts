@@ -42,10 +42,16 @@ export class QuestionandcontentPage implements AfterViewInit {
   ESCAPE_PAGE_END = -9;
 
   content = "";
+  scrollTopPosition: any = 0;
 
   logScrolling($event) {
-    console.log($event.detail.scrollTop);
+    this.scrollTopPosition = $event.detail.scrollTop;
   }
+
+  getScrollTopPosition (): any {
+    return this.scrollTopPosition;
+  }
+
   ngAfterViewInit() {       
     var goodlocate = false;
     this.typeq = this.paramrouterService.param.typeid;
@@ -58,38 +64,24 @@ export class QuestionandcontentPage implements AfterViewInit {
               this.window_map.nativeElement.style.display="block";
               if (!this.map) {
                   console.log("not map yet");
+               /*   if (!navigator.onLine) {
+                    console.log("no connection");
+                    }*/
+                 
                   this.geolocation.getCurrentPosition().then((resp) => {
+                    console.log("this.geolocation.getCurrentPosition()");
                     this.currentLatitude = resp.coords.latitude;
                     this.currentLongitude = resp.coords.longitude;
                     this.createMap(resp.coords.latitude, resp.coords.longitude, res.location.substring(1, res.location.length-1).split(",")[0], res.location.substring(1, res.location.length-1).split(",")[1]);  
+                    goodlocate = this.watchFeature(resp.coords.latitude,resp.coords.longitude, res, goodlocate);
                   }).catch((error) => {
                     console.log('Error getting location', error);
-                  }) 
+                  })
 
                   let watch = this.geolocation.watchPosition();
                   watch.subscribe((data: Geoposition) => {
-                    console.log("watch position");
-                    if ((data.coords.latitude >= +res.location.substring(1, res.location.length-1).split(",")[0] + 0.0001
-                        ||
-                        data.coords.latitude <= +res.location.substring(1, res.location.length-1).split(",")[0] - 0.0001
-                        )
-                        &&
-                        (data.coords.longitude >= +res.location.substring(1, res.location.length-1).split(",")[1] + 0.0001
-                        ||
-                        data.coords.longitude <= +res.location.substring(1, res.location.length-1).split(",")[1] - 0.0001 
-                        )
-                    ) {
-                      this.currentLatitude = data.coords.latitude;
-                      this.currentLongitude = data.coords.longitude;
-                      var greenIcon = this.getGreenIcon();
-                      this.map.removeLayer(this.newMarker);
-                      this.newMarker = marker([data.coords.latitude, data.coords.longitude], {icon: greenIcon}).addTo(this.map);
-                    } else {
-                      if (goodlocate == false) {
-                        goodlocate = true;
-                        this.goodPos();
-                      }
-                    }
+                    console.log("watch suscribe");
+                    goodlocate = this.watchFeature(data.coords.latitude,data.coords.longitude, res, goodlocate);
                   });
               } else { // The map is already loaded, juste change the pointer
                 this.map.removeLayer(this.newMarker);
@@ -159,6 +151,34 @@ export class QuestionandcontentPage implements AfterViewInit {
       })
     })
   }
+
+  watchFeature(latitude, longitude, res, goodlocate): boolean {
+    if ((latitude >= +res.location.substring(1, res.location.length-1).split(",")[0] + 0.0002
+          ||
+        latitude <= +res.location.substring(1, res.location.length-1).split(",")[0] - 0.0002
+         )
+         &&
+        (longitude >= +res.location.substring(1, res.location.length-1).split(",")[1] + 0.0002
+          ||
+        longitude <= +res.location.substring(1, res.location.length-1).split(",")[1] - 0.0002 
+        )
+      ) {
+          this.currentLatitude = latitude;
+          this.currentLongitude = longitude;
+          var greenIcon = this.getGreenIcon();
+          this.map.removeLayer(this.newMarker);
+          this.newMarker = marker([latitude, longitude], {icon: greenIcon}).addTo(this.map);
+          return false;
+        } else {
+          if (goodlocate == false) {
+              goodlocate = true;
+              this.goodPos();
+              return true;
+          }
+        }
+
+  }
+
 //https://gis.stackexchange.com/questions/259969/leaflet-how-to-update-user-position-marker-real-time
   createMap(lat_user, long_user, lat_target, long_target) { //on, modal
       this.map = new Map("map");

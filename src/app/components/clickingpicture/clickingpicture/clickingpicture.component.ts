@@ -54,7 +54,6 @@ export class ClickingpictureComponent implements OnInit {
         let end = '</span>';
 
         this.middleText = res.page.contents.split(start)[1].split(end)[0];
-        console.log(res.page.contents);
         let svg = this.purifingSvg(res, token);
 
         this.content_page=this.sanitizer.bypassSecurityTrustHtml(svg);
@@ -92,13 +91,10 @@ export class ClickingpictureComponent implements OnInit {
     let heightDataEnd = sizeSubstring.indexOf('" width=');
 
     let heightSVG = +sizeSubstring.substr(heightData,heightDataEnd-heightData)
-    console.log(sizeSubstring);
     
     pureSvg = pureSvg.replace(pureSvg.substr(indexHeight, indexEndBalise-indexHeight), "");
 
     let ratio = this.platform.width()/widthSVG;
-    console.log(ratio*widthSVG);
-    console.log(ratio*heightSVG);
 
     if (!(((this.platform.width()+1) >= (ratio*widthSVG)) && ((this.platform.height()+1) >= (ratio*heightSVG)))) {
       ratio = this.platform.height()/heightSVG;
@@ -140,7 +136,6 @@ export class ClickingpictureComponent implements OnInit {
     let neww = 'style="width:'+this.platform.width();
     pureSvg = pureSvg.replace(subw, neww);
     /************************/
-    console.log(pureSvg);
     return pureSvg;
   }
 
@@ -161,7 +156,7 @@ export class ClickingpictureComponent implements OnInit {
           answers.answers.forEach(
             element => {
               if ((parseInt(this.cleanCoord(element.answer)[0])*this.ratio) < (x+10) && (parseInt(this.cleanCoord(element.answer)[0])*this.ratio) > (x-10)) {
-                if ((parseInt(this.cleanCoord(element.answer)[1])*this.ratio) < (y+10) && (parseInt(this.cleanCoord(element.answer)[1])*this.ratio) > (y-10)) {
+                if (((parseInt(this.cleanCoord(element.answer)[1])*this.ratio)-parseInt(this.questionandcontentPage.getScrollTopPosition())) < (y+10) && ((parseInt(this.cleanCoord(element.answer)[1])*this.ratio)-parseInt(this.questionandcontentPage.getScrollTopPosition())) > (y-10)) {
                     el = element;
                 }
               }
