@@ -25,6 +25,7 @@ export class QuestionandcontentPage implements AfterViewInit {
     private router: Router,
     private geolocation: Geolocation) { }
 
+    subscriptionWatch: any;
   currentLatitude: Number;
   currentLongitude: Number;
   map: Map;
@@ -53,6 +54,9 @@ export class QuestionandcontentPage implements AfterViewInit {
   }
 
   ngAfterViewInit() {       
+    console.log("native start");
+    this.progress.nativeElement.style.display="block";
+   
     var goodlocate = false;
     this.typeq = this.paramrouterService.param.typeid;
     this.referenceService.getEscapeId().then(escape_id => {
@@ -64,51 +68,61 @@ export class QuestionandcontentPage implements AfterViewInit {
               this.window_map.nativeElement.style.display="block";
               if (!this.map) {
                   console.log("not map yet");
-               /*   if (!navigator.onLine) {
-                    console.log("no connection");
-                    }*/
-                 
                   this.geolocation.getCurrentPosition().then((resp) => {
                     console.log("this.geolocation.getCurrentPosition()");
+                    this.progress.nativeElement.style.display="none";
                     this.currentLatitude = resp.coords.latitude;
                     this.currentLongitude = resp.coords.longitude;
+                    this.mappy.nativeElement.style.display="block";
                     this.createMap(resp.coords.latitude, resp.coords.longitude, res.location.substring(1, res.location.length-1).split(",")[0], res.location.substring(1, res.location.length-1).split(",")[1]);  
                     goodlocate = this.watchFeature(resp.coords.latitude,resp.coords.longitude, res, goodlocate);
                   }).catch((error) => {
                     console.log('Error getting location', error);
                   })
 
-                  let watch = this.geolocation.watchPosition();
-                  watch.subscribe((data: Geoposition) => {
+                  this.subscriptionWatch = this.geolocation.watchPosition().subscribe((data: Geoposition) => {
                     console.log("watch suscribe");
                     goodlocate = this.watchFeature(data.coords.latitude,data.coords.longitude, res, goodlocate);
                   });
               } else { // The map is already loaded, juste change the pointer
-                this.map.removeLayer(this.newMarker);
-                this.map.removeLayer(this.MarkerTarget);
+                console.log("MAP EXIST");
+                this.subscriptionWatch = this.geolocation.watchPosition().subscribe((data: Geoposition) => {
+                  console.log("watch suscribe REEEE");
+                  goodlocate = this.watchFeature(data.coords.latitude,data.coords.longitude, res, goodlocate);
+                });
 
-                this.MarkerTarget = marker([res.location.substring(1, res.location.length-1).split(",")[0], res.location.substring(1, res.location.length-1).split(",")[1]], {}).addTo(this.map);
+                this.geolocation.getCurrentPosition().then((resp) => {
+                  this.mappy.nativeElement.style.display="block";
+                  this.progress.nativeElement.style.display="none";
+                  console.log("getCurrentPosition REEE")
+                    this.map.removeLayer(this.newMarker);
+                    this.map.removeLayer(this.MarkerTarget);
 
-                var greenIcon = this.getGreenIcon();
-                this.newMarker = marker([this.currentLatitude, this.currentLongitude], {icon: greenIcon}).addTo(this.map);
-              //  this.map.zoomOut(1.2);
-                this.map.fitBounds([[res.location.substring(1, res.location.length-1).split(",")[0], res.location.substring(1, res.location.length-1).split(",")[1]],[this.currentLatitude, this.currentLongitude]]);
-                
-                if (!((this.currentLatitude >= +res.location.substring(1, res.location.length-1).split(",")[0] + 0.0001
-                        ||
-                        this.currentLatitude <= +res.location.substring(1, res.location.length-1).split(",")[0] - 0.0001
-                        )
-                        &&
-                        (this.currentLongitude >= +res.location.substring(1, res.location.length-1).split(",")[1] + 0.0001
-                        ||
-                        this.currentLongitude <= +res.location.substring(1, res.location.length-1).split(",")[1] - 0.0001 
-                        )
-                  )) {
-                    if (goodlocate == false) {
-                      goodlocate = true;
-                      this.goodPos();
+                    this.MarkerTarget = marker([res.location.substring(1, res.location.length-1).split(",")[0], res.location.substring(1, res.location.length-1).split(",")[1]], {}).addTo(this.map);
+
+                    var greenIcon = this.getGreenIcon();
+                    this.newMarker = marker([resp.coords.latitude, resp.coords.longitude], {icon: greenIcon}).addTo(this.map);
+                  //  this.map.zoomOut(1.2);
+                    this.map.fitBounds([[res.location.substring(1, res.location.length-1).split(",")[0], res.location.substring(1, res.location.length-1).split(",")[1]],[this.currentLatitude, this.currentLongitude]]);
+                    
+                    if (!((resp.coords.latitude >= +res.location.substring(1, res.location.length-1).split(",")[0] + 0.0001
+                            ||
+                            resp.coords.latitude <= +res.location.substring(1, res.location.length-1).split(",")[0] - 0.0001
+                            )
+                            &&
+                            (resp.coords.longitude >= +res.location.substring(1, res.location.length-1).split(",")[1] + 0.0001
+                            ||
+                            resp.coords.longitude <= +res.location.substring(1, res.location.length-1).split(",")[1] - 0.0001 
+                            )
+                      )) {
+                        if (goodlocate == false) {
+                          goodlocate = true;
+                          this.goodPos();
+                        }
                     }
-                }
+                }).catch((error) => {
+                  console.log('Error getting location', error);
+                })
               }
             }
             this.title_question = res.page.title;
@@ -229,21 +243,26 @@ export class QuestionandcontentPage implements AfterViewInit {
   }
   
   goodPos() {
+    console.log("unsubscribe");
+    this.subscriptionWatch.unsubscribe();
+
     let alertOptions: AlertOptions = {
       header: 'Localisation',
       buttons: ['Ok']
     }
     alertOptions.message = "Vous êtes arrivé à destination !"
     this.alertController.create(alertOptions).then(alertFire => alertFire.present());
-    
+     //this.subscriptionWatch.unsubscribe();
     //this.map.removeLayer(this.MarkerTarget);
     this.window_map_mask.nativeElement.style.display="none";
     this.window_map.nativeElement.style.display="none";
+    this.mappy.nativeElement.style.display="none";
   }
 
   @ViewChild('myIdentifier', {read: ElementRef}) myIdentifier: ElementRef;
   @ViewChild('window_map_mask', {read: ElementRef}) window_map_mask: ElementRef;
   @ViewChild('window_map', {read: ElementRef}) window_map: ElementRef;
   @ViewChild('map', {read: ElementRef}) mappy: ElementRef;
+  @ViewChild('progress', {read: ElementRef}) progress: ElementRef;
 }
 //https://www.itsolutionstuff.com/post/how-to-get-element-height-and-width-in-angularexample.html

@@ -102,8 +102,6 @@ export class MatchingComponent implements OnInit {
     }
   }
   mapToLocalValue(event: any, idresponse: Number) {
-    console.log(idresponse);
-    console.log(event.detail.value);
     this.formResponse.push([idresponse, event.detail.value]);
   }
 
