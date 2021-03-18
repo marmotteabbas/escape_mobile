@@ -53,7 +53,13 @@ export class ClickingpictureComponent implements OnInit {
         
         let end = '</span>';
 
-        this.middleText = res.page.contents.split(start)[1].split(end)[0];
+     ///   console.log(res.page.contents.split(start)[1]);
+        if (res.page.contents.split(start)[1]) {
+          this.middleText = res.page.contents.split(start)[1].split(end)[0];
+        } else {
+          this.middleText = "";
+        }
+        
         let svg = this.purifingSvg(res, token);
 
         this.content_page=this.sanitizer.bypassSecurityTrustHtml(svg);
