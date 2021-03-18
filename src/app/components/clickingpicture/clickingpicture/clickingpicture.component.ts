@@ -102,7 +102,7 @@ export class ClickingpictureComponent implements OnInit {
 
     let ratio = this.platform.width()/widthSVG;
 
-    if (!(((this.platform.width()+1) >= (ratio*widthSVG)) && ((this.platform.height()+1) >= (ratio*heightSVG)))) {
+    if (!(((this.platform.width()+1) >= (ratio*widthSVG)) /*&& ((this.platform.height()+1) >= (ratio*heightSVG))*/)) {
       ratio = this.platform.height()/heightSVG;
     }
 
@@ -136,7 +136,7 @@ export class ClickingpictureComponent implements OnInit {
     pureSvg = pureSvg.replace("<svg ", "<svg "+'width="'+(ratio*widthSVG)+'" height="'+(ratio*heightSVG)+'"');
 
     let idw1 = pureSvg.indexOf('style="width:');
-    let idw2 = pureSvg.indexOf(';">');
+    let idw2 = pureSvg.indexOf('px;"');
     let subw = pureSvg.substr(idw1, idw2 -idw1);
 
     let neww = 'style="width:'+this.platform.width();

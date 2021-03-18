@@ -8,7 +8,7 @@ import { Storage } from '@ionic/storage';
 })
 export class ReferenceService {
 
-  private AUTH_SERVER_ADDRESS:  string  =  'http://localhost/moodle/';
+  private AUTH_SERVER_ADDRESS:  string  =  'http://193.55.48.132/';
   private static token: string;
   
   public ESCAPE_PAGE_TRUEFALSE = 2;
