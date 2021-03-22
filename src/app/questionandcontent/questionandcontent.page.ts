@@ -69,7 +69,8 @@ export class QuestionandcontentPage implements AfterViewInit {
               if (!this.map) {
                   console.log("not map yet");
                   this.geolocation.getCurrentPosition().then((resp) => {
-                    console.log("this.geolocation.getCurrentPosition()");
+                    console.log(resp.coords.latitude+" ===== "+resp.coords.longitude);
+                    console.log((+res.location.substring(1, res.location.length-1).split(",")[0])+" === "+(+res.location.substring(1, res.location.length-1).split(",")[1]))
                     this.progress.nativeElement.style.display="none";
                     this.currentLatitude = resp.coords.latitude;
                     this.currentLongitude = resp.coords.longitude;
@@ -80,13 +81,17 @@ export class QuestionandcontentPage implements AfterViewInit {
                     console.log('Error getting location', error);
                   })
 
-                  this.subscriptionWatch = this.geolocation.watchPosition().subscribe((data: Geoposition) => {
-                    console.log("watch suscribe");
+                  this.subscriptionWatch = this.geolocation.watchPosition({ maximumAge: 3000, timeout: 30000, enableHighAccuracy: true }).subscribe((data: Geoposition) => {
+                    console.log(data.coords.latitude+" ===== "+data.coords.longitude);
+                    console.log(data);
+                  //https://stackoverflow.com/questions/56432949/ionic4-watchposition-and-getcurrentposition-of-geolocation-not-accurate-with-ion
                     goodlocate = this.watchFeature(data.coords.latitude,data.coords.longitude, res, goodlocate);
                   });
               } else { // The map is already loaded, juste change the pointer
                 console.log("MAP EXIST");
-                this.subscriptionWatch = this.geolocation.watchPosition().subscribe((data: Geoposition) => {
+                //https://github.com/louisbl/cordova-plugin-locationservices
+              
+                this.subscriptionWatch = this.geolocation.watchPosition({ maximumAge: 3000, timeout: 30000, enableHighAccuracy: true }).subscribe((data: Geoposition) => {
                   console.log("watch suscribe REEEE");
                   goodlocate = this.watchFeature(data.coords.latitude,data.coords.longitude, res, goodlocate);
                 });
@@ -105,14 +110,14 @@ export class QuestionandcontentPage implements AfterViewInit {
                   //  this.map.zoomOut(1.2);
                     this.map.fitBounds([[res.location.substring(1, res.location.length-1).split(",")[0], res.location.substring(1, res.location.length-1).split(",")[1]],[this.currentLatitude, this.currentLongitude]]);
                     
-                    if (!((resp.coords.latitude >= +res.location.substring(1, res.location.length-1).split(",")[0] + 0.0001
-                            ||
-                            resp.coords.latitude <= +res.location.substring(1, res.location.length-1).split(",")[0] - 0.0001
+                    if (((resp.coords.latitude <= (+res.location.substring(1, res.location.length-1).split(",")[0] + 0.0001)
+                            &&
+                            resp.coords.latitude >= (+res.location.substring(1, res.location.length-1).split(",")[0] - 0.0001)
                             )
                             &&
-                            (resp.coords.longitude >= +res.location.substring(1, res.location.length-1).split(",")[1] + 0.0001
-                            ||
-                            resp.coords.longitude <= +res.location.substring(1, res.location.length-1).split(",")[1] - 0.0001 
+                            (resp.coords.longitude <= (+res.location.substring(1, res.location.length-1).split(",")[1] + 0.0001)
+                            &&
+                            resp.coords.longitude >= (+res.location.substring(1, res.location.length-1).split(",")[1] - 0.0001) 
                             )
                       )) {
                         if (goodlocate == false) {
@@ -167,15 +172,15 @@ export class QuestionandcontentPage implements AfterViewInit {
   }
 
   watchFeature(latitude, longitude, res, goodlocate): boolean {
-    if ((latitude >= +res.location.substring(1, res.location.length-1).split(",")[0] + 0.0002
-          ||
-        latitude <= +res.location.substring(1, res.location.length-1).split(",")[0] - 0.0002
+    if (!((latitude <= ((+res.location.substring(1, res.location.length-1).split(",")[0]) + 0.0001)
+          &&
+        latitude >= ((+res.location.substring(1, res.location.length-1).split(",")[0]) - 0.0001)
          )
          &&
-        (longitude >= +res.location.substring(1, res.location.length-1).split(",")[1] + 0.0002
-          ||
-        longitude <= +res.location.substring(1, res.location.length-1).split(",")[1] - 0.0002 
-        )
+        (longitude <= ((+res.location.substring(1, res.location.length-1).split(",")[1]) + 0.0001)
+          &&
+        longitude >= ((+res.location.substring(1, res.location.length-1).split(",")[1]) - 0.0001) 
+        ))
       ) {
           this.currentLatitude = latitude;
           this.currentLongitude = longitude;
