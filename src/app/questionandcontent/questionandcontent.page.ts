@@ -54,7 +54,6 @@ export class QuestionandcontentPage implements AfterViewInit {
   }
 
   ngAfterViewInit() {       
-    console.log("native start");
     this.progress.nativeElement.style.display="block";
    
     var goodlocate = false;
@@ -67,10 +66,7 @@ export class QuestionandcontentPage implements AfterViewInit {
               this.window_map_mask.nativeElement.style.display="block";
               this.window_map.nativeElement.style.display="block";
               if (!this.map) {
-                  console.log("not map yet");
                   this.geolocation.getCurrentPosition().then((resp) => {
-                    console.log(resp.coords.latitude+" ===== "+resp.coords.longitude);
-                    console.log((+res.location.substring(1, res.location.length-1).split(",")[0])+" === "+(+res.location.substring(1, res.location.length-1).split(",")[1]))
                     this.progress.nativeElement.style.display="none";
                     this.currentLatitude = resp.coords.latitude;
                     this.currentLongitude = resp.coords.longitude;
@@ -81,25 +77,20 @@ export class QuestionandcontentPage implements AfterViewInit {
                     console.log('Error getting location', error);
                   })
 
-                  this.subscriptionWatch = this.geolocation.watchPosition({ maximumAge: 3000, timeout: 30000, enableHighAccuracy: true }).subscribe((data: Geoposition) => {
-                    console.log(data.coords.latitude+" ===== "+data.coords.longitude);
-                    console.log(data);
+                  this.subscriptionWatch = this.geolocation.watchPosition({ maximumAge: 1000, timeout: 30000, enableHighAccuracy: true }).subscribe((data: Geoposition) => {
                   //https://stackoverflow.com/questions/56432949/ionic4-watchposition-and-getcurrentposition-of-geolocation-not-accurate-with-ion
                     goodlocate = this.watchFeature(data.coords.latitude,data.coords.longitude, res, goodlocate);
                   });
               } else { // The map is already loaded, juste change the pointer
-                console.log("MAP EXIST");
                 //https://github.com/louisbl/cordova-plugin-locationservices
               
-                this.subscriptionWatch = this.geolocation.watchPosition({ maximumAge: 3000, timeout: 30000, enableHighAccuracy: true }).subscribe((data: Geoposition) => {
-                  console.log("watch suscribe REEEE");
+                this.subscriptionWatch = this.geolocation.watchPosition({ maximumAge: 1000, timeout: 30000, enableHighAccuracy: true }).subscribe((data: Geoposition) => {
                   goodlocate = this.watchFeature(data.coords.latitude,data.coords.longitude, res, goodlocate);
                 });
 
                 this.geolocation.getCurrentPosition().then((resp) => {
                   this.mappy.nativeElement.style.display="block";
                   this.progress.nativeElement.style.display="none";
-                  console.log("getCurrentPosition REEE")
                     this.map.removeLayer(this.newMarker);
                     this.map.removeLayer(this.MarkerTarget);
 
@@ -150,9 +141,6 @@ export class QuestionandcontentPage implements AfterViewInit {
             this.content = "Bravo vous avez plié le game! <br />" 
             + res.data[3].message + "<br />"
             + res.data[1].message + "<br />";
-            
-
-            console.log(res);
           }, ( async (error: HttpResponse<Object>) => {
               let alertOptions: AlertOptions = {
                 header: 'Erreur',
@@ -204,7 +192,7 @@ export class QuestionandcontentPage implements AfterViewInit {
       this.map.fitBounds([[lat_user,long_user],[lat_target,long_target]]);
 
       tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png',
-      { attribution: 'Map data © <a href="https://www.openstreetmap.org/">OpenStreetMap</a> contributors,<a href="https://creativecommons.org/licenses/by-sa/2.0/">CC-BY-SA</a>'}).addTo(this.map);
+      { attribution: ''}).addTo(this.map);
       
       this.MarkerTarget = marker([lat_target, long_target], {}).addTo(this.map);
   
@@ -248,7 +236,6 @@ export class QuestionandcontentPage implements AfterViewInit {
   }
   
   goodPos() {
-    console.log("unsubscribe");
     this.subscriptionWatch.unsubscribe();
 
     let alertOptions: AlertOptions = {
