@@ -77,14 +77,16 @@ export class QuestionandcontentPage implements AfterViewInit {
                     console.log('Error getting location', error);
                   })
 
-                  this.subscriptionWatch = this.geolocation.watchPosition({ maximumAge: 1000, timeout: 30000, enableHighAccuracy: true }).subscribe((data: Geoposition) => {
+                  this.subscriptionWatch = this.geolocation.watchPosition({ maximumAge: 4000, timeout: 30000, enableHighAccuracy: true }).subscribe((data: Geoposition) => {
                   //https://stackoverflow.com/questions/56432949/ionic4-watchposition-and-getcurrentposition-of-geolocation-not-accurate-with-ion
+                    console.log(data.coords.latitude+" == "+data.coords.longitude+" --- "+data.coords.accuracy);
                     goodlocate = this.watchFeature(data.coords.latitude,data.coords.longitude, res, goodlocate);
                   });
               } else { // The map is already loaded, juste change the pointer
                 //https://github.com/louisbl/cordova-plugin-locationservices
               
-                this.subscriptionWatch = this.geolocation.watchPosition({ maximumAge: 1000, timeout: 30000, enableHighAccuracy: true }).subscribe((data: Geoposition) => {
+                this.subscriptionWatch = this.geolocation.watchPosition({ maximumAge: 4000, timeout: 30000, enableHighAccuracy: true }).subscribe((data: Geoposition) => {
+                  console.log(data.coords.latitude+" == "+data.coords.longitude);
                   goodlocate = this.watchFeature(data.coords.latitude,data.coords.longitude, res, goodlocate);
                 });
 
@@ -204,7 +206,7 @@ export class QuestionandcontentPage implements AfterViewInit {
 
   getGreenIcon() {
     return L.icon({
-      iconUrl: 'https://static.thenounproject.com/png/331569-200.png',
+      iconUrl: '/assets/img/pin.png',
 
       iconSize:     [50, 50], // size of the icon
       iconAnchor:   [25, 50], // point of the icon which will correspond to marker's location
