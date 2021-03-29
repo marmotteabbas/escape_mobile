@@ -77,7 +77,7 @@ export class QuestionandcontentPage implements AfterViewInit {
                     console.log('Error getting location', error);
                   })
 
-                  this.subscriptionWatch = this.geolocation.watchPosition({ maximumAge: 1500, /*timeout: 30000,*/ enableHighAccuracy: true }).subscribe((data: Geoposition) => {
+                  this.subscriptionWatch = this.geolocation.watchPosition({ maximumAge: 2500, /*timeout: 30000,*/ enableHighAccuracy: true }).subscribe((data: Geoposition) => {
                   //https://stackoverflow.com/questions/56432949/ionic4-watchposition-and-getcurrentposition-of-geolocation-not-accurate-with-ion
                     console.log(data.coords.latitude+" == "+data.coords.longitude+" --- "+data.coords.accuracy);
                     goodlocate = this.watchFeature(data.coords.latitude,data.coords.longitude, res, goodlocate);
@@ -85,7 +85,7 @@ export class QuestionandcontentPage implements AfterViewInit {
               } else { // The map is already loaded, juste change the pointer
                 //https://github.com/louisbl/cordova-plugin-locationservices
               
-                this.subscriptionWatch = this.geolocation.watchPosition({ maximumAge: 1500/*, timeout: 30000*/, enableHighAccuracy: true }).subscribe((data: Geoposition) => {
+                this.subscriptionWatch = this.geolocation.watchPosition({ maximumAge: 2500/*, timeout: 30000*/, enableHighAccuracy: true }).subscribe((data: Geoposition) => {
                   console.log(data.coords.latitude+" == "+data.coords.longitude);
                   goodlocate = this.watchFeature(data.coords.latitude,data.coords.longitude, res, goodlocate);
                 });
